@@ -16,17 +16,28 @@ getFromList "Johan" = Just $ MkPerson "Johan" "Martinsson" 30
 getFromList "Bobby" = Just $ MkPerson "Bobby" "Joe" 55
 getFromList _ = Nothing
 
+fullname : Person -> String 
+fullname x = firstName x ++ " " ++ lastName x
+
 printname : Maybe Person -> String
-printname Nothing = ""
-printname (Just x) = firstName x ++ " " ++ lastName x
+printname Nothing = "No Person found"
+printname (Just x) = fullname x
+
+printname : Either Person -> String
+
+printFor : String -> String
+printFor = printname . getFromList
 
 main : IO ()
 main = spec $ do
   describe "This is my math test" $ do
     it "adds two natural numbers" $ do
-      (printname $ getFromList "Johan") `shouldBe` "Johan Martinsson"
+      (printFor "Johan") `shouldBe` "Johan Martinsson"
     it "empty" $ do
-      (printname $ getFromList "Bobby") `shouldBe` "Bobby Joe"
+      (printFor "Bobby") `shouldBe` "Bobby Joe"
+    it "empty" $ do
+      (printFor "No existing person") `shouldBe` "No Person found"
+
 
 
 
