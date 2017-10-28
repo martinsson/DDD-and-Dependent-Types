@@ -1,0 +1,4 @@
+bin/
+*.ibc
+*.idr~
+*.swp
