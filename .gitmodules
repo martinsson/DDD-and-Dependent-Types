@@ -1,0 +1,6 @@
+[submodule "specdris"]
+	path = specdris
+	url = /Users/johan/3rdparty/specdris
+[submodule "lib/specdris"]
+	path = lib/specdris
+	url = /Users/johan/3rdparty/specdris
