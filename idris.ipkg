@@ -1,0 +1,6 @@
+package idris
+
+modules = Testable
+	, Test.Testable
+
+tests = testAddIsSumming
