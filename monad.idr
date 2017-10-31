@@ -23,10 +23,12 @@ printname : Maybe Person -> String
 printname Nothing = "No Person found"
 printname (Just x) = fullname x
 
-printname : Either Person -> String
+assertOld : Int -> Person -> Either () Person
+assertOld x y = Right johan
 
 printFor : String -> String
 printFor = printname . getFromList
+
 
 main : IO ()
 main = spec $ do
