@@ -1,8 +1,9 @@
 import Specdris.Spec
 
 fizzbuzz : (a: Nat) -> String
-fizzbuzz (S (S (S Z)) = "Fizz"
-fizzbuzz a = show a
+fizzbuzz a = case mod a 3 of 
+                Z => "Fizz"
+                _ => show a 
 
 main : IO ()
 main = spec $ do
@@ -10,4 +11,4 @@ main = spec $ do
     it "passes all rest" $ do
       map fizzbuzz [1, 2, 4, 7, 8, 11, 13] `shouldBe` ["1", "2", "4", "7", "8", "11", "13"]
     it "fizzez for 3's " $ do 
-      fizzbuzz 3 `shouldBe` "Fizz"
+      map fizzbuzz [3, 6, 9, 12] `shouldBe` ["Fizz", "Fizz", "Fizz", "Fizz"] 
