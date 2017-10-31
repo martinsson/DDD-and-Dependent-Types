@@ -2,8 +2,9 @@ import Specdris.Spec
 
 fizzbuzz : (a: Nat) -> String
 fizzbuzz a = case [mod a 3, mod a 5] of 
-                [?sdfkZ, ?sldfkss] => "Fizz"
-                [?sl, ?sf] => "Buzz"
+                [Z, Z] => "FizzBuzz"
+                [Z, _] => "Fizz"
+                [_, Z] => "Buzz"
                 _ => show a 
 
 main : IO ()
