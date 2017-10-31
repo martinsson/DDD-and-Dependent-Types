@@ -8,6 +8,24 @@ addZeros : Num e => Vect n e -> Vect (addTwo n) e
 addZeros (x :: xs) = x :: addZeros xs
 addZeros Nil = [0, 0]
 
+myzip : Vect n a -> Vect n b -> Vect n (a,b)
+myzip [] [] = []
+myzip (x :: xs) (y :: ys) = (x, y)::(myzip xs ys)
+
+-- twice : (n : Nat) -> (k ** k = n + n)
+-- twice n = (n ** [k, n+n])
+
+typedMin : (a: Nat) -> (b: Nat) -> (c ** c = (a + b) )
+typedMin a b = ?sdklfj
+
+
+-- johanzip : Vect n a -> Vect m b -> Vect (min n m) (a,b)
+-- johanzip [] [] = []
+-- johanzip [] (x :: xs) = []
+-- johanzip (x :: xs) [] = []
+-- johanzip (x :: xs) (y :: ys) = (x, y)::(johanzip xs ys)
+
+
 pp : Vect n a -> Vect m a -> Vect (n + m) a
 pp Nil       ys = ys
 pp (x :: xs) ys = x :: ( pp xs ys)
