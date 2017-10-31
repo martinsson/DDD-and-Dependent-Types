@@ -5,8 +5,6 @@ fizzbuzz a = show a
 
 main : IO ()
 main = spec $ do
-  describe "This is my math test" $ do
-    it "adds two natural numbers" $ do
-      fizzbuzz 1 `shouldBe` "1"
+  describe "fizzbuzz" $ do
     it "passes all rest" $ do
-      map fizzbuzz [1, 2] `shouldBe` ["1", "2"]
+      map fizzbuzz [1, 2, 4, 7, 8, 11, 13] `shouldBe` ["1", "2", "4", "7", "8", "11", "13"]
