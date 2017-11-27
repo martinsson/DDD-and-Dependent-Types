@@ -16,4 +16,6 @@ over_length : Nat -> List String -> Nat
 over_length n xs = List.length (filter longEnough xs)
   where longEnough = \s => length s > n
 
+main : IO () 
+main = repl "Enter a possible palindrome: " ( \s => show (palindrome 1 s) ++ "\n")
 
