@@ -19,3 +19,4 @@ over_length n xs = List.length (filter longEnough xs)
 main : IO () 
 main = repl "Enter a possible palindrome: " ( \s => show (palindrome 1 s) ++ "\n")
 
+
