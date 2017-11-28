@@ -19,6 +19,7 @@ diversion Z = [[]]
 diversion (S Z) = [[0], [1]]
 diversion (S (S k)) = [ (x :: y :: xs) | 
                   x <- [Z , 1], 
-                  (y :: xs) <- diversion (S k) ] 
+                  (y :: xs) <- diversion (S k), 
+                  not (x == 1 && y == 1)] 
 
-
+-- oh so lenght diversion n is the fibonacci suite
