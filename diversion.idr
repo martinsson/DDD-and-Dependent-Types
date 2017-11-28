@@ -16,8 +16,8 @@ flatten (x :: xs) = x ++ flatten xs
 
 diversion : (n: Nat) -> List (List Nat)
 diversion Z = [[]]
--- diversion (S Z) = (0 :: []) :: (1 :: [])
-diversion (S Z) = [ (x :: xs) | x <- [0, 1], xs <- diversion Z] 
-diversion (S (S k)) = [ (x :: xs) | x <- [0, 1], xs <- diversion (S k)] 
+diversion (S k) = [ (x :: xs) | 
+                  x <- [0, 1], 
+                  xs <- diversion k ] 
 
 
