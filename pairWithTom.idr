@@ -22,7 +22,7 @@ isFizz Z = True
 isFizz _ = False
 
 data FBT : (a : Nat) -> Type where
-  FizzC : (a : Nat) -> (isFizz a = True) -> FBT a
+  FizzC : (a : Nat) -> (a = 3) -> FBT a
   Number : FBT a
 
 -- fb : (a : Nat) -> FBT a
@@ -31,7 +31,7 @@ data FBT : (a : Nat) -> Type where
             -- No contra => Number
 
 fb : (a : Nat) -> FBT a
-fb a = case decEq (a % 3 == 0) True of
+fb a = case decEq a 3 of
             Yes prf => FizzC a prf
             No contra => Number
 
