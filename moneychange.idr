@@ -7,17 +7,24 @@ TwoP = 2
 
 -- data Shange = Nat -> CoinType -> Nat -> Type where
 --   SimpleShange : CoinType -> Nat 
-data Change : (value: Nat) -> (quantity: Nat) -> (amount: Nat) -> Type where
-  Simple : (value: Nat) -> (quantity: Nat) -> Change value quantity (value * quantity)
+data Change : (amount: Nat) -> Type where
+  Simple : (value: Nat) -> (quantity: Nat) -> Change (value * quantity)
 
-data CompositeChange : Change v1 q1 a1 -> Change v2 q2 a2 -> (totalAmount: Nat) -> Type where
-  Composite :  (ch1: Change v1 q1 a1) -> (ch2: Change v2 q2 a2) -> CompositeChange ch1 ch2 (a1+a2)
+data CompositeChange : (totalAmount: Nat) -> Type where
+  Composite :  (ch1: Change a1) -> (ch2: Change a2) -> CompositeChange (a1+a2)
 
-constrainedChange : (amount: Nat) -> CompositeChange change1 change2 amount 
+constrainedChange : (amount: Nat) -> CompositeChange amount 
 -- constrainedChange amount = Composite ?sdf ?slkdfjlskf
 
-someChange : Change value quantity 4 
+someChange : Change 4 
 someChange = Simple 2 2
+
+someChange2 : Change 8 
+someChange2 = Simple 2 4
+
+
+someComposite : CompositeChange 12
+someComposite = Composite someChange someChange2
 
 -- data Shange (n: Nat) -> (m: Nat) -> (amount: Nat) -> Type where
   
