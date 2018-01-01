@@ -3,11 +3,13 @@ import Data.Vect
 data Change : (amount: Nat) -> Type where
   NoChange : Change Z
   SucChange : (prev: Change amount) -> Change (S amount) 
-  Simple : (value: Nat) -> (quantity: Nat) -> Change (value * quantity)
+  Simple : (value: Nat) -> (quantity: Nat) -> 
+           {auto prf: value * quantity = amount'} -> Change amount' 
 
 change : (amount: Nat) -> Change amount
-change Z = NoChange
-change (S k) = SucChange (change k)
+-- change Z = NoChange
+-- change (S k) = SucChange (change k)
+change amount = let prf = multOneRightNeutral amount in ?skldfj
 
 data CompositeChange : (totalAmount: Nat) -> Type where
   Composite :  (ch1: Change a1) -> (ch2: Change a2) -> CompositeChange (a1+a2)
