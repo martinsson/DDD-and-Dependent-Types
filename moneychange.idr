@@ -1,4 +1,4 @@
-import Data.Vect
+%default total
 
 data Change : (amount: Nat) -> Type where
   NoChange : Change Z
@@ -6,10 +6,15 @@ data Change : (amount: Nat) -> Type where
   Simple : (value: Nat) -> (quantity: Nat) -> 
            {auto prf: value * quantity = amount'} -> Change amount' 
 
+extractAmount : (Change amount) -> Nat
+extractAmount {amount} _ = amount
+
+Eq (Change amount) where
+  (==) x y = (extractAmount x) == (extractAmount y)
+
+
 change : (amount: Nat) -> Change amount
--- change Z = NoChange
--- change (S k) = SucChange (change k)
-change amount = rewrite (sym $ multOneRightNeutral amount )
+change amount = rewrite (sym $ multOneRightNeutral amount) 
                     in Simple amount 1
 
 data CompositeChange : (totalAmount: Nat) -> Type where
