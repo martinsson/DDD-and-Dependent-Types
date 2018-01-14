@@ -16,16 +16,10 @@ Eq (Change amount) where
   (==) x y = (extractAmount x) == (extractAmount y)
 
 
-
-multZeroNotGT0 : (0 = S k) -> Void
-multZeroNotGT0 Refl impossible
-
-multZeroNotGT0Right : (mult k 0 = S j) -> Void
-multZeroNotGT0Right {k} prf = ?sdkfjs --rewrite (sym $ multZeroRightZero k) in ?sldkjf
-
-
 change : (amount: Nat) -> Change amount
 change Z = NoChange
-change (S k) = SucChange (change k) 
+change (S k) = rewrite (sym $ plusZeroRightNeutral k) in 
+                       Composite (SucChange (change k)) NoChange
 
 
+-- change2 : (amount: Nat) -> Change
