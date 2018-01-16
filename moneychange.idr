@@ -1,12 +1,13 @@
 %default total
 
+-- 1. Total of all the coins returns is the input amount
+-- 2. There is no other solution for this number where there is less coins
+
 data Change : (amount: Nat) -> Type where
   NoChange : Change Z
-  SucChange : (prev: Change amount) -> Change (S amount) 
-  Composite : (ch1: Change amount1) -> (ch2: Change amount2) ->  
-              {auto prf: amount1 + amount2 = amount'}-> Change amount'
---  Simple : (value: Nat) -> (quantity: Nat) -> 
---           {auto prf: value * quantity = amount'} -> Change amount' 
+  NextCoin : (value: Nat) -> (prev: Change prevAmount) -> 
+             {auto prf: value + prevAmount = amount'} -> 
+             Change amount'
 
 
 extractAmount : (Change amount) -> Nat
@@ -18,8 +19,11 @@ Eq (Change amount) where
 
 change : (amount: Nat) -> Change amount
 change Z = NoChange
-change (S k) = rewrite (sym $ plusZeroRightNeutral k) in 
-                       Composite (SucChange (change k)) NoChange
+change (S Z) = NextCoin 1 (change Z) 
+change (S (S k)) = NextCoin 2 (change k) 
+
+-- calculateTotal : List Coin -> Nat
+-- change' : (amount: Nat) -> (calculateTotal coins = amount ** coins : List Coin)
 
 
 -- change2 : (amount: Nat) -> Change
