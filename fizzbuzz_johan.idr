@@ -1,36 +1,30 @@
 %default total
 
-modula5 : (dividend: Nat) -> Nat
-modula5 Z = 0
-modula5 (S Z) = 1
-modula5 (S (S Z)) = 2
-modula5 (S (S (S Z))) = 3
-modula5 (S (S (S (S Z)))) = 4
-modula5 (S (S (S (S (S k))))) = modula5 k
 
-modula3 : (dividend: Nat) -> Nat
-modula3 Z = 0
-modula3 (S Z) = 1
-modula3 (S (S Z)) = 2
-modula3 (S (S (S j))) = modula3 j
+IsFizz : (k : Nat) -> Type
+IsFizz k = (modNatNZ k 3 SIsNotZ = 0)
+
+IsBuzz : Nat -> Type
+IsBuzz k = (modNatNZ k 5 SIsNotZ = 0)
 
 data Fizzbuzz : (k: Nat) -> Type where
-  Fizz : (k: Nat) -> {auto prf : modula3 k = 0} -> Fizzbuzz k
-  Buzz : (k: Nat) -> {auto prf : modula5 k = 0} -> Fizzbuzz k
-  FizzBuzz : (k: Nat) -> 
-             {auto prf : modula3 k = 0} -> 
-             {auto prf : modula5 k = 0} -> 
-             Fizzbuzz k
-  Normal : (k: Nat) -> 
-           (prf : (modula3 k = 0) -> Void ) -> 
-           (prf : (modula5 k = 0) -> Void ) -> 
-           Fizzbuzz k
+  Fizz : (k: Nat) -> IsFizz k -> Not (IsBuzz k) -> Fizzbuzz k
+  Buzz : (k: Nat) -> Not (IsFizz k) -> IsBuzz k -> Fizzbuzz k
+  FizzBuzz : (k: Nat) -> IsFizz k -> IsBuzz k -> Fizzbuzz k
+  Normal : (k: Nat) -> Not (IsFizz k) -> Not (IsBuzz k) -> Fizzbuzz k
 
 fizzbuzz : (k: Nat) -> Fizzbuzz k
-fizzbuzz k = let isFizz = decEq (modula3 k) 0 
-                 isBuzz = decEq (modula5 k) 0 in 
+fizzbuzz k = let isFizz = decEq (modNatNZ k 3 SIsNotZ) 0 
+                 isBuzz = decEq (modNatNZ k 5 SIsNotZ) 0 in 
                  case (isFizz, isBuzz) of
-                       (Yes isfizz, No notbuzz) => Fizz k
-                       (No notfizz, Yes isfizz) => Buzz k
-                       (Yes isfizz, Yes isbuzz) => FizzBuzz k
+                       (Yes isfizz, No notbuzz) => Fizz k isfizz notbuzz
+                       (No notfizz, Yes isbuzz) => Buzz k notfizz isbuzz
+                       (Yes isfizz, Yes isbuzz) => FizzBuzz k isfizz isbuzz
                        (No notfizz, No notbuzz) => Normal k notfizz notbuzz
+
+showFizzBuzz : Nat -> String
+showFizzBuzz k = case fizzbuzz k of
+                  Fizz k _ _     => "fizz"
+                  Buzz k _ _     => "buzz"
+                  FizzBuzz k _ _ => "fizzbuzz"
+                  Normal k _ _   => show k
