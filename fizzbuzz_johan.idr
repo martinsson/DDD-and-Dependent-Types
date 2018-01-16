@@ -1,24 +1,34 @@
--- %default total
+%default total
 
+modula5 : (dividend: Nat) -> Nat
+modula5 Z = 0
+modula5 (S Z) = 1
+modula5 (S (S Z)) = 2
+modula5 (S (S (S Z))) = 3
+modula5 (S (S (S (S Z)))) = 4
+modula5 (S (S (S (S (S k))))) = modula5 k
 
-testMod: Nat -> Nat
-testMod k = modNatNZ k 3 SIsNotZ
+modula3 : (dividend: Nat) -> Nat
+modula3 Z = 0
+modula3 (S Z) = 1
+modula3 (S (S Z)) = 2
+modula3 (S (S (S j))) = modula3 j
 
 data Fizzbuzz : (k: Nat) -> Type where
-  Fizz : (k: Nat) -> {auto prf : modNat k 3 = 0} -> Fizzbuzz k
-  Buzz : (k: Nat) -> {auto prf : mod k 5 = 0} -> Fizzbuzz k
+  Fizz : (k: Nat) -> {auto prf : modula3 k = 0} -> Fizzbuzz k
+  Buzz : (k: Nat) -> {auto prf : modula5 k = 0} -> Fizzbuzz k
   FizzBuzz : (k: Nat) -> 
-             {auto prf : modNat k 3 = 0} -> 
-             {auto prf : mod k 5 = 0} -> 
+             {auto prf : modula3 k = 0} -> 
+             {auto prf : modula5 k = 0} -> 
              Fizzbuzz k
   Normal : (k: Nat) -> 
-           (prf : (modNat k 3 = 0) -> Void ) -> 
-           (prf : (mod k 5 = 0) -> Void ) -> 
+           (prf : (modula3 k = 0) -> Void ) -> 
+           (prf : (modula5 k = 0) -> Void ) -> 
            Fizzbuzz k
 
 fizzbuzz : (k: Nat) -> Fizzbuzz k
-fizzbuzz k = let isFizz = decEq (modNat k 3) 0 
-                 isBuzz = decEq (mod k 5) 0 in 
+fizzbuzz k = let isFizz = decEq (modula3 k) 0 
+                 isBuzz = decEq (modula5 k) 0 in 
                  case (isFizz, isBuzz) of
                        (Yes isfizz, No notbuzz) => Fizz k
                        (No notfizz, Yes isfizz) => Buzz k
