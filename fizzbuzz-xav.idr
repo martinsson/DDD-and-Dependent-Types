@@ -13,6 +13,8 @@ data FizzBuzz : (n: Nat) ->  Type where
   NotFizz : {auto nfizz : So (not (fizz n)) } -> FizzBuzz n
   NotBuzz : {auto nfizz : So (not (buzz n)) } -> FizzBuzz n
 
+data FizzBuzzCombo = Combo (FizzBuzz n, FizzBuzz n)
+
 Show (FizzBuzz n) where 
   show Fizz = "Fizz" 
   show Buzz = "Buzz"
