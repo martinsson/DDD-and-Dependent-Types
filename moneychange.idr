@@ -26,9 +26,9 @@ removeN (S j) (S k) (LTESucc prf) =
 change : (amount: Nat) -> Change amount
 change Z = NoChange
 change (S Z) = NextCoin 1 (change Z) 
-change amount@(S (S k)) = case (5 `isLTE` amount) of
-                               (Yes prf) => let (result ** amountPrf) = removeN 5 amount prf  
-                                in ?holeee
+change (S (S k)) = case (5 `isLTE` (S (S k))) of
+                               (Yes prf) => let (result ** amountPrf) = removeN 5 (S (S k)) prf  
+                               in NextCoin 5 (change result) {prf = amountPrf} 
                                (No contra) => ?sjdf_3
 
 --result + j = k -> result (S j) = (S k)
