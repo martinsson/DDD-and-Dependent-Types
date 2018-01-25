@@ -1,4 +1,4 @@
-%default total
+--%default total
 
 -- 1. Total of all the coins returns is the input amount
 -- 2. There is no other solution for this number where there is less coins
@@ -6,7 +6,7 @@
 data Change : (amount: Nat) -> Type where
   NoChange : Change Z
   NextCoin : (value: Nat) -> (prev: Change prevAmount) -> 
-             {auto prf: value + prevAmount = amount'} -> 
+             {auto prf: prevAmount + value = amount'} -> 
              Change amount'
 
 
@@ -27,7 +27,7 @@ change : (amount: Nat) -> Change amount
 change Z = NoChange
 change (S Z) = NextCoin 1 (change Z) 
 change (S (S k)) = case (5 `isLTE` (S (S k))) of
-                               (Yes prf) => let (result ** amountPrf) = removeN 5 (S (S k)) prf  
+                               (Yes prf) => let (result **  amountPrf) = removeN 5 (S (S k)) prf  
                                in NextCoin 5 (change result) {prf = amountPrf} 
                                (No contra) => ?sjdf_3
 
