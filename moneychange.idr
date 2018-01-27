@@ -1,7 +1,5 @@
 --%default total
 
--- 1. Total of all the coins returns is the input amount
-
 data Change : (amount: Nat) -> Type where
   NoChange : Change Z
   NextCoin : (value: Nat) -> (prev: Change prevAmount) -> 
@@ -19,12 +17,16 @@ removeN (S j) (S k) (LTESucc prf) =
       (result ** rewrite sym $ plusSuccRightSucc result j in 
                  rewrite eqSucc (result + j) k prevProof in Refl)
 
+-- 1. Total of all the coins returns is the input amount
+-- 2. There is no other solution for this number where there are less coins
+
 change : (amount: Nat) -> Change amount
 change Z = NoChange
 change (S Z) = NextCoin 1 (change Z) 
-change (S (S k)) = case (5 `isLTE` (S (S k))) of
-                               (Yes prf) => let (result **  amountPrf) = removeN 5 (S (S k)) prf  
-                               in NextCoin 5 (change result) {prf = amountPrf} 
+change (S (S k)) = let coinValue = (the Nat 5)
+                   in case (coinValue `isLTE` (S (S k))) of
+                               (Yes prf) => let (result **  amountPrf) = removeN coinValue (S (S k)) prf  
+                                            in NextCoin coinValue (change result) {prf = amountPrf} 
                                (No contra) => rewrite plusCommutative 1 k in 
                                                       NextCoin 1 (change (S k)) 
 
