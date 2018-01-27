@@ -1,14 +1,25 @@
 --%default total
+data Coin  : (value: Nat) -> Type where
+  OneCent  : Coin 1
+  FiveCent : Coin 5
 
 data Change : (amount: Nat) -> Type where
   NoChange : Change Z
   NextCoin : (value: Nat) -> (prev: Change prevAmount) -> 
              {auto prf: value + prevAmount = amount} -> 
              Change amount
+  NextCoinn : (coin: Coin value) -> (prev: Change prevAmount) -> 
+             {auto prf: value + prevAmount = amount} -> 
+             Change amount
+
+
+showCoinVal : (coin : Coin value) -> String
+showCoinVal coin {value} = show value 
 
 Show (Change amount) where
   show NoChange = "0"
   show (NextCoin value prev) = show value ++ " + " ++ show prev 
+  show (NextCoinn coin prev) = showCoinVal coin ++ " + " ++ show prev 
 
 removeN : (n: Nat) -> (k: Nat) -> (prf : n `LTE` k) -> (result ** n + result = k)
 removeN Z k prf = (k ** Refl ) 
