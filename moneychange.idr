@@ -24,8 +24,9 @@ change Z = NoChange
 change (S Z) = NextCoin 1 (change Z) 
 change (S (S k)) = let coinValue = (the Nat 5)
                    in case (coinValue `isLTE` (S (S k))) of
-                           (Yes prf) => let (remainingAmount **  amountPrf) = removeN coinValue (S (S k)) prf  
-                                        in NextCoin coinValue (change remainingAmount) {prf = amountPrf} 
+                           (Yes lteProof) => let (remainingAmount **  prf) = removeN coinValue (S (S k)) lteProof  
+                                                 remainingChange = change remainingAmount
+                                             in NextCoin coinValue remainingChange
                            (No contra) => NextCoin 1 (change (S k)) 
 
 main : IO()
