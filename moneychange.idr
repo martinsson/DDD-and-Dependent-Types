@@ -32,13 +32,13 @@ removeN (S j) (S k) (LTESucc prf) =
 
 change : (amount: Nat) -> Change amount
 change Z = NoChange
-change (S Z) = NextCoin 1 (change Z) 
+change (S Z) = NextCoinn OneCent (change Z) 
 change (S (S k)) = let coinValue = (the Nat 5)
                    in case (coinValue `isLTE` (S (S k))) of
                            (Yes lteProof) => let (remainingAmount **  prf) = removeN coinValue (S (S k)) lteProof  
                                                  remainingChange = change remainingAmount
                                              in NextCoin coinValue remainingChange
-                           (No contra) => NextCoin 1 (change (S k)) 
+                           (No contra) => NextCoinn OneCent (change (S k)) 
 
 main : IO()
 main = putStrLn $ show (change 15)
