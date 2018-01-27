@@ -25,8 +25,8 @@ change Z = NoChange
 change (S Z) = NextCoin 1 (change Z) 
 change (S (S k)) = let coinValue = (the Nat 5)
                    in case (coinValue `isLTE` (S (S k))) of
-                               (Yes prf) => let (result **  amountPrf) = removeN coinValue (S (S k)) prf  
-                                            in NextCoin coinValue (change result) {prf = amountPrf} 
+                               (Yes prf) => let (remainingAmount **  amountPrf) = removeN coinValue (S (S k)) prf  
+                                            in NextCoin coinValue (change remainingAmount) {prf = amountPrf} 
                                (No contra) => rewrite plusCommutative 1 k in 
                                                       NextCoin 1 (change (S k)) 
 
