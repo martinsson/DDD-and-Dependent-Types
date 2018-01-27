@@ -1,20 +1,16 @@
 --%default total
 
 -- 1. Total of all the coins returns is the input amount
--- 2. There is no other solution for this number where there is less coins
 
 data Change : (amount: Nat) -> Type where
   NoChange : Change Z
   NextCoin : (value: Nat) -> (prev: Change prevAmount) -> 
-             {auto prf: prevAmount + value = amount'} -> 
-             Change amount'
+             {auto prf: prevAmount + value = amount} -> 
+             Change amount
 
-
-extractAmount : (Change amount) -> Nat
-extractAmount {amount} _ = amount
-
-Eq (Change amount) where
-  (==) x y = (extractAmount x) == (extractAmount y)
+Show (Change amount) where
+  show NoChange = "0"
+  show (NextCoin value prev) = show value ++ " + " ++ show prev 
 
 removeN : (n: Nat) -> (k: Nat) -> (prf : n `LTE` k) -> (result ** result + n = k)
 removeN Z k prf = (k ** rewrite plusZeroRightNeutral k in Refl)
@@ -29,16 +25,11 @@ change (S Z) = NextCoin 1 (change Z)
 change (S (S k)) = case (5 `isLTE` (S (S k))) of
                                (Yes prf) => let (result **  amountPrf) = removeN 5 (S (S k)) prf  
                                in NextCoin 5 (change result) {prf = amountPrf} 
-                               (No contra) => ?sjdf_3
+                               (No contra) => rewrite plusCommutative 1 k in 
+                                                      NextCoin 1 (change (S k)) 
 
---result + j = k -> result (S j) = (S k)
---(S (plus result j)) = S k
-
-
-
-
--- calculateTotal : List Coin -> Nat
--- change' : (amount: Nat) -> (calculateTotal coins = amount ** coins : List Coin)
+main : IO()
+main = putStrLn $ show (change 15)
 
 
--- change2 : (amount: Nat) -> Change
+
