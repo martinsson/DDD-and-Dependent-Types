@@ -11,23 +11,19 @@ data Question : Type where
       -> (expected : Fin numOptions)
       -> Question
 
-data Answer : (q : Question) -> (option: Fin n) -> Type where
-  AnswerQCM   : (option : Fin n) -> Answer (QCM {numOptions = n } q opts exp) option
+data Answer : (q : Question) -> (m: Nat) -> Type where
+  AnswerQCM : (option : Fin n) -> 
+              (prf: finToNat option = m) ->
+              Answer (QCM {numOptions = n } q opts exp) m
+  
+couldntHappen : (x: Fin numOptions) -> ((finToNat x = n) -> Void) -> ( Answer (QCM {numOptions} question qcmOptions expected) n -> Void)
 
-lteIsFin : (LTE a b) -> Fin b
+validateAnswer : (n : Nat) -> (q : Question) -> Dec (Answer q n)
+validateAnswer n (QCM {numOptions} question qcmOptions expected) =
+ (case natToFin n numOptions of
+       Nothing => No ?slkjdf_1
+       (Just x) => case decEq (finToNat x) n of  -- this is absurd, x was made from n sot they are eqaual
+                        (Yes prf) => Yes (AnswerQCM x prf) -- here we're happy as we have the proof
+                        (No contra) => No (couldntHappen x contra))  -- here we have a contra proof of pretty much the proof AnswerQCM takes 
 
-notLTENotFin : (LTE a b -> Void) -> (Fin b -> Void)
-notLTENotFin f FZ = ?notLTENotFin_rhs_2
-notLTENotFin f (FS x) = ?notLTENotFin_rhs_3
-
-notUbNoAnswer :  ((ub: Fin numOpttions) -> Void) -> 
-               ( Answer (QCM {numOptions} question qcmOptions expected) ub  -> Void)
-
-validateAnswer : (n : Nat) -> (q : Question) -> Dec (Answer q ub)
-validateAnswer n (QCM {numOptions} question qcmOptions expected) = 
-  (case n `isLTE` numOptions of
-        (Yes prf) => Yes ?sdfjj -- (AnswerQCM ?ksjdf )
-        (No contra) => let fin = notLTENotFin contra 
-                           -- noAnwser = notUbNoAnswer fin 
-                           in No ?noAnswer)
 
