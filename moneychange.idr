@@ -12,15 +12,6 @@ data Change : (amount: Nat) -> Type where
              {auto prf: value + prevAmount = amount} -> 
              Change amount
 
-
-showCoinVal : (coin : Coin value) -> String
-showCoinVal coin {value} = show value 
-
-Show (Change amount) where
-  show NoChange = "0"
-  show (NextCoin value prev) = show value ++ " + " ++ show prev 
-  show (NextCoinn coin prev) = showCoinVal coin ++ " + " ++ show prev 
-
 removeN : (n: Nat) -> (k: Nat) -> (prf : n `LTE` k) -> (result ** n + result = k)
 removeN Z k prf = (k ** Refl ) 
 removeN (S j) (S k) (LTESucc prf) =
@@ -40,8 +31,20 @@ change (S (S k)) = let coinValue = (the Nat 5)
                                              in NextCoin coinValue remainingChange
                            (No contra) => NextCoinn OneCent (change (S k)) 
 
+showCoinVal : (coin : Coin value) -> String
+showCoinVal coin {value} = show value 
+
+Show (Change amount) where
+  show NoChange = "0"
+  show (NextCoin value prev) = show value ++ " + " ++ show prev 
+  show (NextCoinn coin prev) = showCoinVal coin ++ " + " ++ show prev 
+
 main : IO()
-main = putStrLn $ show (change 15)
+main = putStrLn $ show (change 13)
+--main = do 
+--  putStrLn "how much? "
+--  amount <- getLine
+--  putStrLn $ show (change amount)
 
 
 
