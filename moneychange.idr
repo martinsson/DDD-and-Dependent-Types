@@ -5,9 +5,6 @@ data Coin  : (value: Nat) -> Type where
 
 data Change : (amount: Nat) -> Type where
   NoChange : Change Z
-  NextCoin : (value: Nat) -> (prev: Change prevAmount) -> 
-             {auto prf: value + prevAmount = amount} -> 
-             Change amount
   NextCoinn : (coin: Coin value) -> (prev: Change prevAmount) -> 
              {auto prf: value + prevAmount = amount} -> 
              Change amount
@@ -16,12 +13,8 @@ data Change : (amount: Nat) -> Type where
 showCoinVal : (coin : Coin value) -> String
 showCoinVal coin {value} = show value 
 
-getCoinVal : Coin value -> Nat
-getCoinVal _ {value} = value
-
 Show (Change amount) where
   show NoChange = "0"
-  show (NextCoin value prev) = show value ++ " + " ++ show prev 
   show (NextCoinn coin prev) = showCoinVal coin ++ " + " ++ show prev 
 
 removeN : (n: Nat) -> (k: Nat) -> (prf : n `LTE` k) -> (result ** n + result = k)
