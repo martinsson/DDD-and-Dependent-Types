@@ -33,7 +33,22 @@ removeN (S j) (S k) (LTESucc prf) =
 -- 1. Total of all the coins returns is the input amount
 -- 2. There is no other solution for this number where there are less coins
 
-changeHelper : (amount: Nat) -> Coin value -> Change amount
+changeHelper : (amount: Nat) -> Coin coinValue -> Change amount
+changeHelper Z c = NoChange
+changeHelper (S Z) c = NextCoinn OneCent (changeHelper Z c) 
+changeHelper (S (S k)) coin {coinValue} = 
+                   case (coinValue `isLTE` (S (S k))) of
+                           (Yes lteProof) => appendValueOf coinValue (S (S k)) lteProof  
+                           (No contra) => NextCoinn OneCent (changeHelper (S k) OneCent)
+       where 
+         appendValueOf: (coinValue: Nat) -> (amount: Nat) -> (lteProof: coinValue `LTE` amount) -> Change amount
+         appendValueOf coinValue amount lteProof =  let (remainingAmount **  prf) = removeN coinValue amount lteProof  
+                                                        remainingChange = changeHelper remainingAmount coin
+                                                    in NextCoin coinValue remainingChange
+         appendCoinOf: (coin: Coin value) -> (amount: Nat) -> (lteProof: value `LTE` amount) -> Change amount
+         appendCoinOf coin {value} amount lteProof =  let (remainingAmount **  prf) = removeN value amount lteProof  
+                                                          remainingChange = changeHelper remainingAmount coin
+                                                          in NextCoinn coin remainingChange
  
 
 change : (amount: Nat) -> Change amount
