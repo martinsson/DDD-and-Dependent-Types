@@ -16,6 +16,9 @@ data Change : (amount: Nat) -> Type where
 showCoinVal : (coin : Coin value) -> String
 showCoinVal coin {value} = show value 
 
+getCoinVal : Coin value -> Nat
+getCoinVal _ {value} = value
+
 Show (Change amount) where
   show NoChange = "0"
   show (NextCoin value prev) = show value ++ " + " ++ show prev 
