@@ -35,10 +35,15 @@ change Z = NoChange
 change (S Z) = NextCoinn OneCent (change Z) 
 change (S (S k)) = let coinValue = (the Nat 5)
                    in case (coinValue `isLTE` (S (S k))) of
-                           (Yes lteProof) => let (remainingAmount **  prf) = removeN coinValue (S (S k)) lteProof  
-                                                 remainingChange = change remainingAmount
-                                             in NextCoin coinValue remainingChange
+                           (Yes lteProof) => appendCoinOf coinValue (S (S k)) lteProof  
                            (No contra) => NextCoinn OneCent (change (S k)) 
+       where 
+         appendCoinOf: (coinValue: Nat) -> (amount: Nat) -> (lteProof: coinValue `LTE` amount) -> Change amount
+         appendCoinOf coinValue amount lteProof =  let (remainingAmount **  prf) = removeN coinValue amount lteProof  
+                                                       remainingChange = change remainingAmount
+                                                   in NextCoin coinValue remainingChange
+
+
 
 main : IO()
 main = putStrLn $ show (change 15)
