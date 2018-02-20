@@ -33,6 +33,9 @@ removeN (S j) (S k) (LTESucc prf) =
 -- 1. Total of all the coins returns is the input amount
 -- 2. There is no other solution for this number where there are less coins
 
+changeHelper : (amount: Nat) -> Coin value -> Change amount
+ 
+
 change : (amount: Nat) -> Change amount
 change Z = NoChange
 change (S Z) = NextCoinn OneCent (change Z) 
