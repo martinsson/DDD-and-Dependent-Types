@@ -48,9 +48,7 @@ changeHelper (S (S k)) coin {coinValue} =
  
 
 change : (amount: Nat) -> Change amount
-change Z = NoChange
-change (S Z) = NextCoinn OneCent (change Z) 
-change (S (S k)) = changeHelper (S (S k)) FiveCent
+change amount = changeHelper amount FiveCent 
 
 giveChangeOf : Nat -> String
 giveChangeOf k = (show (change k))
