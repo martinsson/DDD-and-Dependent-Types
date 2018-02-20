@@ -2,7 +2,9 @@ import Data.Vect
 
 --// types first => append
 
-append : List a -> List a -> List a
+append : Vect n a -> Vect m a -> Vect (n+m) a
+append [] ys = ys
+append (x :: xs) ys = x :: append xs ys
 
 
 
@@ -31,8 +33,6 @@ append : List a -> List a -> List a
 
 
 modulo : (dividend: Nat) -> (divisor: Nat) -> Nat
-modulo dividend (S k) = ?modulo_rhs_2
-
 
 
 
@@ -48,7 +48,7 @@ modulo dividend (S k) = ?modulo_rhs_2
 
 data Change : (amount: Nat) -> Type where
   NoChange : Change Z
-  NextCoinn : (coin: Coin value) -> (prev: Change prevAmount) -> 
+  NextCoinn : (value: Nat) -> (prev: Change prevAmount) -> 
              {auto prf: value + prevAmount = amount} -> 
              Change amount
 
@@ -57,13 +57,12 @@ change : (amount: Nat) -> Change amount
 
 
 
+--data Coin  : (value: Nat) -> Type where
+--  OneCent  : Coin 1
+--  FiveCent : Coin 5
 
 
 
 
-
-data Coin  : (value: Nat) -> Type where
-  OneCent  : Coin 1
-  FiveCent : Coin 5
 
 
