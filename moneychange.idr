@@ -1,3 +1,5 @@
+import Data.String
+
 --%default total
 data Coin  : (value: Nat) -> Type where
   OneCent  : Coin 1
@@ -5,7 +7,7 @@ data Coin  : (value: Nat) -> Type where
 
 data Change : (amount: Nat) -> Type where
   NoChange : Change Z
-  NextCoinn : (coin: Coin value) -> (prev: Change prevAmount) -> 
+  NextCoin : (coin: Coin value) -> (prev: Change prevAmount) -> 
              {auto prf: value + prevAmount = amount} -> 
              Change amount
 
@@ -15,7 +17,7 @@ showCoinVal coin {value} = show value
 
 Show (Change amount) where
   show NoChange = "0"
-  show (NextCoinn coin prev) = showCoinVal coin ++ " + " ++ show prev 
+  show (NextCoin coin prev) = showCoinVal coin ++ " + " ++ show prev 
 
 removeN : (n: Nat) -> (k: Nat) -> (prf : n `LTE` k) -> (result ** n + result = k)
 removeN Z k prf = (k ** Refl ) 
@@ -28,18 +30,23 @@ removeN (S j) (S k) (LTESucc prf) =
 
 changeHelper : (amount: Nat) -> Coin coinValue -> Change amount
 changeHelper Z c = NoChange
-changeHelper (S Z) c = NextCoinn OneCent NoChange
+changeHelper (S Z) c = NextCoin OneCent NoChange -- Todo remove this special case
 changeHelper (S (S k)) coin {coinValue} = 
                    case (coinValue `isLTE` (S (S k))) of
                            (Yes lteProof) => appendCoinOf coin (S (S k)) lteProof  
-                           (No contra) => NextCoinn OneCent (changeHelper (S k) OneCent)
+                           (No contra) => NextCoin OneCent (changeHelper (S k) OneCent)
        where 
          appendCoinOf: (coin: Coin value) -> (amount: Nat) -> (lteProof: value `LTE` amount) -> Change amount
          appendCoinOf coin {value} amount lteProof =  let (remainingAmount **  prf) = removeN value amount lteProof  
                                                           remainingChange = changeHelper remainingAmount coin
-                                                          in NextCoinn coin remainingChange
+                                                          in NextCoin coin remainingChange
  
 
+-- Learning: if I don't lift the coin to the type level like in changeHelper then I cannot use the value inside 
+-- as it will not unify with the One- or Five-Cent coin, in particular hte lteProof will not unify
+
+-- Learning: using where clauses allows for nice private methods, defined after the call
+-- Learning: parsePositive takes the type as an implicit parameter, great!
 change : (amount: Nat) -> Change amount
 change amount = changeHelper amount FiveCent 
 
@@ -48,7 +55,14 @@ giveChangeOf k = (show (change k))
 
 
 main : IO()
-main = putStrLn $ show (change 15)
+main = do 
+  putStrLn "what's the required amount?"
+  x <- getLine 
+  case parsePositive {a=Nat} x of
+       Nothing => putStrLn "please provide a positive integer"
+       (Just x) => putStrLn $ "The change is " ++ show (change x)
+  main
+-- putStrLn $ show (change 15)
 
 
 
