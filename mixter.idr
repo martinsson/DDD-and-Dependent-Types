@@ -1,17 +1,20 @@
 UserId: Type
 UserId = String
 
-data Message = Msg UserId String
-data DeleteCommand = DelCmd UserId   
+data Message: (userId: UserId) -> Type where 
+  MkMessage: (userId: UserId) -> String -> Message userId
+data DeleteCommand: (userId: UserId) -> Type where
+  MkDeleteCommand: (userId: UserId) -> DeleteCommand userId  
 
-data Event = DeleteEvent DeleteCommand Message  
+-- command.author = msg.userId
+data Event : Type where 
+  DeleteEvent: (DeleteCommand userId) -> (Message userId) -> Event  
            
+cmd : DeleteCommand "Florent"
+cmd = MkDeleteCommand "Florent"
 
-cmd : DeleteCommand
-cmd = DelCmd "Emilien"
-
-msg : Message
-msg = Msg "Florent" "on est bien là"
+msg : Message "Emilien"
+msg = MkMessage "Emilien" "on est bien là"
 
 myEvent : Event
 myEvent = DeleteEvent cmd msg
