@@ -9,9 +9,13 @@ data DeleteCommand: (userId: UserId) -> Type where
 -- command.author = msg.userId
 data Event : Type where 
   DeleteEvent: (DeleteCommand userId) -> (Message userId) -> Event  
-           
-cmd : DeleteCommand "Florent"
-cmd = MkDeleteCommand "Florent"
+          
+mkEvent: DeleteCommand userId -> Message userId -> Event
+mkEvent command message = DeleteEvent command message
+
+
+cmd : DeleteCommand "Emilien"
+cmd = MkDeleteCommand "Emilien"
 
 msg : Message "Emilien"
 msg = MkMessage "Emilien" "on est bien là"
