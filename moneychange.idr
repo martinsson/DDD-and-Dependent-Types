@@ -32,15 +32,15 @@ removeN (S j) (S k) (LTESucc prf) =
 
 changeHelper : (amount: Nat) -> Coin coinValue -> List CoinT -> Change amount
 changeHelper Z c coins = NoChange
-changeHelper (S Z) c coins = NextCoin OneCent NoChange -- Todo remove this special case
-changeHelper (S (S k)) coin {coinValue} coins = 
-                   case (coinValue `isLTE` (S (S k))) of
-                           (Yes lteProof) => appendCoinOf coin (S (S k)) lteProof  
-                           (No contra) => NextCoin OneCent (changeHelper (S k) OneCent [])
+changeHelper (S k) coin [] = NextCoin OneCent (changeHelper k OneCent []) 
+changeHelper (S k) coin {coinValue} (x :: xs) = 
+                   case (coinValue `isLTE` (S k)) of
+                           (No contra) => NextCoin OneCent (changeHelper k OneCent [])
+                           (Yes lteProof) => appendCoinOf coin (S k) lteProof  
        where 
          appendCoinOf: (coin: Coin value) -> (amount: Nat) -> (lteProof: value `LTE` amount) -> Change amount
          appendCoinOf coin {value} amount lteProof =  let (remainingAmount **  prf) = removeN value amount lteProof  
-                                                          remainingChange = changeHelper remainingAmount coin ?rest
+                                                          remainingChange = changeHelper remainingAmount coin xs
                                                           in NextCoin coin remainingChange
  
 
