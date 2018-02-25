@@ -33,9 +33,9 @@ removeN (S j) (S k) (LTESucc prf) =
 changeHelper : (amount: Nat) -> Coin coinValue -> List CoinT -> Change amount
 changeHelper Z c coins = NoChange
 changeHelper (S k) coin [] = NextCoin OneCent (changeHelper k OneCent []) 
-changeHelper (S k) coin {coinValue} (x :: xs) = 
+changeHelper (S k) coin {coinValue} (x@(MkCoinT nextCoin) :: xs) = 
                    case (coinValue `isLTE` (S k)) of
-                           (No contra) => changeHelper (S k) ?xx xs
+                           (No contra) => changeHelper (S k) nextCoin xs
                            (Yes lteProof) => appendCoinOf coin (S k) lteProof  
        where 
          appendCoinOf: (coin: Coin value) -> (amount: Nat) -> (lteProof: value `LTE` amount) -> Change amount
