@@ -35,12 +35,12 @@ changeHelper Z c coins = NoChange
 changeHelper (S k) coin [] = NextCoin OneCent (changeHelper k OneCent []) 
 changeHelper (S k) coin {coinValue} (x :: xs) = 
                    case (coinValue `isLTE` (S k)) of
-                           (No contra) => NextCoin OneCent (changeHelper k OneCent [])
+                           (No contra) => changeHelper (S k) ?xx xs
                            (Yes lteProof) => appendCoinOf coin (S k) lteProof  
        where 
          appendCoinOf: (coin: Coin value) -> (amount: Nat) -> (lteProof: value `LTE` amount) -> Change amount
          appendCoinOf coin {value} amount lteProof =  let (remainingAmount **  prf) = removeN value amount lteProof  
-                                                          remainingChange = changeHelper remainingAmount coin xs
+                                                          remainingChange = changeHelper remainingAmount coin (x :: xs) 
                                                           in NextCoin coin remainingChange
  
 
