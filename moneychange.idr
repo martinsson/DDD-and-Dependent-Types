@@ -1,3 +1,4 @@
+module moneychange
 import Data.String
 
 --%default total
@@ -14,12 +15,12 @@ data Change : (amount: Nat) -> Type where
              {auto prf: value + prevAmount = amount} -> 
              Change amount
 
-showCoinVal : (coin : Coin value) -> String
-showCoinVal coin {value} = show value 
+Show (Coin v) where
+  show x {v} = show v
 
 Show (Change amount) where
   show NoChange = "0"
-  show (NextCoin coin prev) = showCoinVal coin ++ " + " ++ show prev 
+  show (NextCoin coin prev) = show coin ++ " + " ++ show prev 
 
 removeN : (n: Nat) -> (k: Nat) -> (prf : n `LTE` k) -> (result ** n + result = k)
 removeN Z k prf = (k ** Refl ) 
@@ -55,10 +56,6 @@ allCoinT = [MkCoinT OneCent, MkCoinT FiveCent]
 change : (amount: Nat) -> Change amount
 change amount = changeHelper amount FiveCent allCoinT  
 
-giveChangeOf : Nat -> String
-giveChangeOf k = (show (change k))
-
-
 main : IO()
 main = do 
   putStrLn "what's the required amount?"
@@ -67,7 +64,6 @@ main = do
        Nothing => putStrLn "please provide a positive integer"
        (Just x) => putStrLn $ "The change is " ++ show (change x)
   main
--- putStrLn $ show (change 15)
 
 
 
