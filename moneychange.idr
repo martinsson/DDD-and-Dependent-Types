@@ -5,6 +5,7 @@ import Data.String
 data Coin  : (value: Nat) -> Type where
   OneCent  : Coin 1
   FiveCent : Coin 5
+  TenCent  : Coin 10
 
 data CoinT : Type where
   MkCoinT : Coin v -> CoinT
@@ -49,12 +50,12 @@ changeHelper (S k) coin {coinValue} (x@(MkCoinT nextCoin) :: xs) =
 -- as it will not unify with the One- or Five-Cent coin, in particular hte lteProof will not unify
 
 allCoinT : List CoinT
-allCoinT = [MkCoinT OneCent, MkCoinT FiveCent]
+allCoinT = [MkCoinT TenCent, MkCoinT FiveCent, MkCoinT OneCent]
 
 -- Learning: using where clauses allows for nice private methods, defined after the call
 -- Learning: parsePositive takes the type as an implicit parameter, great!
 change : (amount: Nat) -> Change amount
-change amount = changeHelper amount FiveCent allCoinT  
+change amount = changeHelper amount TenCent allCoinT  
 
 main : IO()
 main = do 
