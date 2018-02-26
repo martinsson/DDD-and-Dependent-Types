@@ -30,10 +30,10 @@ groupByCoinType change = groupByHelper change []
 where
   groupByHelper : Change a -> List (Nat, CoinT) -> List (Nat, CoinT)
   groupByHelper NoChange groups = groups
-  groupByHelper (NextCoin coin prev) [] = [(1, MkCoinT coin)]
+  groupByHelper (NextCoin coin prev) [] = groupByHelper prev [(1, MkCoinT coin)]
   groupByHelper (NextCoin coin prev) ((quantity, coinT) :: xs) =  if getVal coin == getCoinTval coinT 
-                                                                     then ((quantity+1, coinT) :: xs)
-                                                                     else ((1, coinT) :: xs)
+                                                                     then groupByHelper prev ((quantity+1, coinT) :: xs)
+                                                                     else groupByHelper prev ((1, MkCoinT coin) :: (quantity, coinT) :: xs)
 
 
 Show (Coin v) where
@@ -52,8 +52,7 @@ removeN (S j) (S k) (LTESucc prf) =
 -- 1. Total of all the coins returns is the input amount
 -- 2. There is no other solution for this number where there are less coins
 
-changeHelper : (amount: Nat) -> Coin coinValue -> List CoinT -> Change amount
-changeHelper Z c coins = NoChange
+changeHelper : (amount: Nat) -> Coin coinValue -> List CoinT -> Change amount 
 changeHelper (S k) coin [] = NextCoin OneCent (changeHelper k OneCent []) 
 changeHelper (S k) coin {coinValue} (x@(MkCoinT smallerCoin) :: xs) = 
                    case (coinValue `isLTE` (S k)) of
