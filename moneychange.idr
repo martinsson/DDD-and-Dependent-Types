@@ -7,8 +7,17 @@ data Coin  : (value: Nat) -> Type where
   FiveCent : Coin 5
   TenCent  : Coin 10
 
+getVal : Coin v -> Nat
+getVal _ {v} = v
+
+Eq (Coin v) where
+  (==) x y = getVal x == getVal y
+
 data CoinT : Type where
   MkCoinT : Coin v -> CoinT
+
+getCoinTval : CoinT -> Nat 
+getCoinTval (MkCoinT x) = getVal x
 
 data Change : (amount: Nat) -> Type where
   NoChange : Change Z
@@ -16,7 +25,16 @@ data Change : (amount: Nat) -> Type where
              {auto prf: value + prevAmount = amount} -> 
              Change amount
              
-groupByCoinType : Change amount -> List (quantity, CoinT) 
+groupByCoinType : Change amount -> List (Nat, CoinT) 
+groupByCoinType change = groupByHelper change [] 
+where
+  groupByHelper : Change a -> List (Nat, CoinT) -> List (Nat, CoinT)
+  groupByHelper NoChange groups = groups
+  groupByHelper (NextCoin coin prev) [] = [(1, MkCoinT coin)]
+  groupByHelper (NextCoin coin prev) ((quantity, coinT) :: xs) =  if getVal coin == getCoinTval coinT 
+                                                                     then ((quantity+1, coinT) :: xs)
+                                                                     else ((1, coinT) :: xs)
+
 
 Show (Coin v) where
   show x {v} = show v
