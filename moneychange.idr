@@ -15,6 +15,8 @@ data Change : (amount: Nat) -> Type where
   NextCoin : (coin: Coin value) -> (prev: Change prevAmount) -> 
              {auto prf: value + prevAmount = amount} -> 
              Change amount
+             
+groupByCoinType : Change amount -> List (quantity, CoinT) 
 
 Show (Coin v) where
   show x {v} = show v
@@ -35,9 +37,9 @@ removeN (S j) (S k) (LTESucc prf) =
 changeHelper : (amount: Nat) -> Coin coinValue -> List CoinT -> Change amount
 changeHelper Z c coins = NoChange
 changeHelper (S k) coin [] = NextCoin OneCent (changeHelper k OneCent []) 
-changeHelper (S k) coin {coinValue} (x@(MkCoinT nextCoin) :: xs) = 
+changeHelper (S k) coin {coinValue} (x@(MkCoinT smallerCoin) :: xs) = 
                    case (coinValue `isLTE` (S k)) of
-                           (No contra) => changeHelper (S k) nextCoin xs
+                           (No contra) => changeHelper (S k) smallerCoin xs
                            (Yes lteProof) => appendCoinOf coin (S k) lteProof  
        where 
          appendCoinOf: (coin: Coin value) -> (amount: Nat) -> (lteProof: value `LTE` amount) -> Change amount
