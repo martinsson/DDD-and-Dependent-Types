@@ -3,44 +3,42 @@ import Data.List
 UserId: Type
 UserId = String
 
-data Message: (userId: UserId) -> Type where 
-  MkMessage: (userId: UserId) -> String -> Message userId
+||| a tweet has a userId - the author
+data Tweet: (userId: UserId) -> Type where 
+  MkTweet: (userId: UserId) -> String -> Tweet userId
+
+||| Command emitted by user and parsed by a router
 data DeleteCommand: (userId: UserId) -> Type where
   MkDeleteCommand: (userId: UserId) -> DeleteCommand userId  
 
+getUserId : (x : DeleteCommand userId) -> UserId
+getUserId _ {userId}  = userId
 
-mutual
-  data MessageCreated: Type where
-    MkMessageCreated: UserId -> MessageCreated
-  
-  data MessageDeleted: Type where
-    MkMessageDeleted: (DeleteCommand userId) -> (Message userId) 
-                      -> (history: History)
-                      -> IsNotDeleted history 
-                      -> MessageDeleted  
+Eq (DeleteCommand userId) where
+  (==) x y = getUserId x == getUserId x 
 
-  data Event =  Deleted MessageDeleted | Created MessageCreated
-  
-  History : Type
-  History = List Event
+DecEq (DeleteCommand userId) where 
+  decEq (MkDeleteCommand userId) (MkDeleteCommand userId) = Yes Refl
 
-  IsNotDeleted : (history : History) -> Type 
-  IsNotDeleted history = Not (length history = 2)
+||| Only the author of a tweet can emit this event, that's enforced
+||| by the fact that in order to instantiate this event we need to provide both
+||| a Tweet and a Deletecommand having the same userId. 
+||| The calling code needs to show that they are identical, otherwise it won't compile
+data TweetDeleted: Type where
+  MkTweetDeleted: (DeleteCommand userId) -> (Tweet userId) 
+                    -> TweetDeleted  
 
-  
-isNotDeleted : (history : List Event) -> Dec (IsNotDeleted history)
-isNotDeleted history =  decEq (Not (length history) 2)
-  
-mkEvent: DeleteCommand userId -> Message userId -> History ->  Maybe MessageDeleted
-mkEvent command message history = case (isNotDeleted history)  of
-                                   (Yes prf) => Just (MkMessageDeleted command message history prf)
-                                   (No contra) => Nothing
+||| basic example of creating the event
+myDeletionEvent : TweetDeleted
+myDeletionEvent = let cmd =  MkDeleteCommand "Emilien"
+                      msg = MkTweet "Emilien" "Type Driven Development rocks!" in
+                  MkTweetDeleted cmd msg 
 
-cmd : DeleteCommand "Emilien"
-cmd = MkDeleteCommand "Emilien"
+realWorldExample : Tweet authorId -> DeleteCommand userId -> Maybe TweetDeleted
+realWorldExample tweet@(MkTweet authorId _) cmd@(MkDeleteCommand userId) = 
+                      case decEq cmd (MkDeleteCommand authorId) of
+                          (Yes prf) => ?ksjdf ---rewrite prf in Just $ MkTweetDeleted cmd tweet 
+                          (No contra) => ?realWorldExample_rhs_3
 
-msg : Message "Emilien"
-msg = MkMessage "Emilien" "on est bien là"
-
-myEvent : MessageDeleted
-myEvent = mkEvent cmd msg [] 
+data TweetCreated: Type where
+  MkTweetCreated: UserId -> TweetCreated
