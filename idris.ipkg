@@ -1,6 +1,10 @@
 package idris
 
+<<<<<<< HEAD
 modules = Testable
 	, Test.Testable
 
 tests = testAddIsSumming
+=======
+pkgs = specdris
+>>>>>>> TDDLyon
