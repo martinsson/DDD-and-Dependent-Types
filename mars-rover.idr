@@ -45,8 +45,34 @@ Show RoverState where
 Eq RoverState where
   (==) (MkPos w s) (MkPos z t) = w == z && s == t
 
+data Command = L | R | M | NoCommand
+
+getCommand: Char -> Command
+getCommand x = if x == 'L' 
+                  then L
+               else if x == 'R'
+                  then R
+               else if x == 'M'
+                 then M 
+               else NoCommand 
+
+turnLeft : (state : RoverState) -> RoverState
+turnLeft (MkPos coord (dx, dy)) = let leftComplexNumber = (1, 0) 
+                                      (leftx, lefty) = leftComplexNumber  
+                                      newDir = (dx * leftx - dy * lefty, dy * leftx + dx * lefty) in
+                                        MkPos coord newDir
+-- ((a*c-b*d):+(b*c+a*d))
 moveRover: RoverState -> (instructions: String) -> RoverState
-moveRover x instructions = MkPos (1, 2) W
+moveRover state instructions = MkPos (1, 2) W where
+  moveRoverHelper: RoverState -> (commands: List Char) -> RoverState
+  moveRoverHelper state [] = state
+  moveRoverHelper state (c :: cs) = case getCommand c of 
+                                         L => moveRoverHelper (turnLeft state) cs
+                                         R => moveRoverHelper (?turnRight state) cs
+                                         M => moveRoverHelper (?moveForward state) cs
+                                         NoCommand => moveRoverHelper state cs
+
+
 
 main: IO ()
 main = spec $ do 
