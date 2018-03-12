@@ -1,5 +1,6 @@
 import Specdris.Spec
 import Data.SortedMap
+-- idris mars-rover.idr -p specdris -p contrib
 
 -- Input
 -- 5 5          grid size
@@ -40,21 +41,9 @@ Show RoverState where
 Eq RoverState where
   (==) (MkPos w s) (MkPos z t) = w == z && s == t
 
-data Command = L | R | M | NoCommand
-
--- I could return the function instead of a type here
-getCommand: Char -> Command
-getCommand x = if x == 'L' 
-                  then L
-               else if x == 'R'
-                  then R
-               else if x == 'M'
-                 then M 
-               else NoCommand 
-
 turnLeft : (state : RoverState) -> RoverState
-turnLeft (MkPos coord (dx, dy)) = let leftComplexNumber = (0, 1) 
-                                      (leftx, lefty) = leftComplexNumber  
+turnLeft (MkPos coord (dx, dy)) = let lef90DegreesComplexNumber = (0, 1) 
+                                      (leftx, lefty) = lef90DegreesComplexNumber  
                                       newDir = (dx * leftx - dy * lefty, dy * leftx + dx * lefty) in
                                         MkPos coord newDir
 
@@ -64,16 +53,23 @@ turnRight state = turnLeft $ turnLeft $ turnLeft state
 moveForward : (state: RoverState) -> RoverState
 moveForward (MkPos (x, y) dir@(dx, dy)) = MkPos (x + dx, y + dy) dir
 
+identity : RoverState -> RoverState
+identity state = state
+
+getCommand: Char -> (RoverState -> RoverState)
+getCommand x = if x == 'L' 
+                  then turnLeft
+               else if x == 'R'
+                  then turnRight
+               else if x == 'M'
+                 then moveForward 
+               else identity 
+               
 moveRover: RoverState -> (instructions: String) -> RoverState
 moveRover state instructions = moveRoverHelper state (unpack instructions) where
   moveRoverHelper: RoverState -> (commands: List Char) -> RoverState
   moveRoverHelper state [] = state
-  moveRoverHelper state (c :: cs) = case getCommand c of 
-                                         -- clearly here we need to get the function to apply instead
-                                         L => moveRoverHelper (turnLeft state) cs
-                                         R => moveRoverHelper (turnRight state) cs
-                                         M => moveRoverHelper (moveForward state) cs
-                                         NoCommand => moveRoverHelper state cs
+  moveRoverHelper state (c :: cs) = moveRoverHelper ((getCommand c) state) cs
 
 
 
