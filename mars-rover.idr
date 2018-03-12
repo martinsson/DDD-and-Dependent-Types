@@ -20,6 +20,7 @@ Coord = (Integer, Integer) -- perhaps this could be Fin of the board size
 IntDirection : Type
 IntDirection = (Integer, Integer) 
 
+-- use some kind of a map, with reversible key-values
 N : IntDirection
 N = (0, 1)
 
@@ -41,6 +42,9 @@ Show RoverState where
 Eq RoverState where
   (==) (MkPos w s) (MkPos z t) = w == z && s == t
 
+-- use a type alias for RoverActions?
+
+-- improvement use complex numbers in contrib
 turnLeft : (state : RoverState) -> RoverState
 turnLeft (MkPos coord (dx, dy)) = let lef90DegreesComplexNumber = (0, 1) 
                                       (leftx, lefty) = lef90DegreesComplexNumber  
@@ -56,20 +60,23 @@ moveForward (MkPos (x, y) dir@(dx, dy)) = MkPos (x + dx, y + dy) dir
 identity : RoverState -> RoverState
 identity state = state
 
-getCommand: Char -> (RoverState -> RoverState)
-getCommand x = if x == 'L' 
-                  then turnLeft
-               else if x == 'R'
-                  then turnRight
-               else if x == 'M'
-                 then moveForward 
-               else identity 
-               
+getRoverAction: Char -> (RoverState -> RoverState)
+getRoverAction x = if x == 'L' 
+                      then turnLeft
+                   else if x == 'R'
+                      then turnRight
+                   else if x == 'M'
+                     then moveForward 
+                   else identity 
+
+
+-- should we rather build the list of actions perhaps? then just fold?
 moveRover: RoverState -> (instructions: String) -> RoverState
 moveRover state instructions = moveRoverHelper state (unpack instructions) where
   moveRoverHelper: RoverState -> (commands: List Char) -> RoverState
   moveRoverHelper state [] = state
-  moveRoverHelper state (c :: cs) = moveRoverHelper ((getCommand c) state) cs
+  moveRoverHelper state (c :: cs) = let action = getRoverAction c in 
+                                        moveRoverHelper (action state) cs
 
 
 
