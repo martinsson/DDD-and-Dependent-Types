@@ -14,6 +14,7 @@ import Data.Matrix.Numeric
 -- 
 -- 1 3 N        Rover 1s final position
 -- 5 1 E        Rover 2s ...
+%default total
 
 Coord: Type
 Coord = Vect 2 Integer -- perhaps this could be Fin of the board size
@@ -23,6 +24,9 @@ IntDirection = Vect 2 Integer
 
 data RoverState = MkPos Coord IntDirection 
   
+RoverAction: Type
+RoverAction = RoverState -> RoverState
+
 Show RoverState where
   show (MkPos [x, y] dir) = show x ++ " " ++ show y ++ " " ++ showDirection dir where 
     showDirection: IntDirection -> String
@@ -38,23 +42,22 @@ Show RoverState where
 Eq RoverState where
   (==) (MkPos coord1 dir1) (MkPos coord2 dir2) = coord1 == coord2 && dir1 == dir2
 
--- use a type alias for RoverActions?
-turnLeft : RoverState -> RoverState
+turnLeft : RoverAction
 turnLeft (MkPos coord direction) = let newDir = direction <\> leftRotation in
                                         MkPos coord newDir where
   leftRotation : Matrix 2 2 Integer
   leftRotation = [[0, 1], [-1, 0]] 
 
-turnRight : RoverState -> RoverState
+turnRight : RoverAction
 turnRight state = turnLeft $ turnLeft $ turnLeft state
 
-moveForward : RoverState -> RoverState
+moveForward : RoverAction
 moveForward (MkPos coord dir) = MkPos (coord + dir) dir
 
-identity : RoverState -> RoverState
+identity : RoverAction
 identity state = state
 
-getRoverAction: Char -> (RoverState -> RoverState)
+getRoverAction: Char -> RoverAction
 getRoverAction x = if x == 'L' 
                       then turnLeft
                    else if x == 'R'
