@@ -21,34 +21,29 @@ Coord = Vect 2 Integer -- perhaps this could be Fin of the board size
 IntDirection : Type
 IntDirection = Vect 2 Integer
 
--- use some kind of a map, with reversible key-values
-N : IntDirection
-N = [0, 1]
-
-W : IntDirection
-W = [-1, 0]
-
-S : IntDirection
-S = [0, -1]
-
-E : IntDirection
-E = [1, 0]
-
 data RoverState = MkPos Coord IntDirection 
   
 Show RoverState where
-  show (MkPos [x, y] dir) = show x ++ " " ++ show y ++ " " ++ show dir 
+  show (MkPos [x, y] dir) = show x ++ " " ++ show y ++ " " ++ showDirection dir where 
+    showDirection: IntDirection -> String
+    showDirection x = show (fromMaybe '$' (lookup x directions)) where
+        directions : SortedMap IntDirection Char
+        directions = fromList [
+          ([ 0,  1], 'N'),
+          ([-1,  0], 'W'),
+          ([ 0, -1], 'S'),
+          ([ 1,  0], 'E')]
 
 -- why can't there be some default implem?
 Eq RoverState where
-  (==) (MkPos w s) (MkPos z t) = w == z && s == t
+  (==) (MkPos coord1 dir1) (MkPos coord2 dir2) = coord1 == coord2 && dir1 == dir2
 
 -- use a type alias for RoverActions?
 turnLeft : RoverState -> RoverState
 turnLeft (MkPos coord direction) = let newDir = direction <\> leftRotation in
                                         MkPos coord newDir where
   leftRotation : Matrix 2 2 Integer
-  leftRotation = [[1, 0], [0, -1]] 
+  leftRotation = [[0, 1], [-1, 0]] 
 
 turnRight : RoverState -> RoverState
 turnRight state = turnLeft $ turnLeft $ turnLeft state
@@ -78,6 +73,17 @@ moveRover state instructions = moveRoverHelper state (unpack instructions) where
                                         moveRoverHelper (action state) cs
 
 
+N : IntDirection
+N = [0, 1]
+
+W : IntDirection
+W = [-1, 0]
+
+S : IntDirection
+S = [0, -1]
+
+E : IntDirection
+E = [1, 0]
 
 main: IO ()
 main = spec $ do 
