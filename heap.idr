@@ -2,24 +2,41 @@ import Specdris.Spec
 
 %default total
 
-data BBT = EmptyTree | Leaf Integer | Chunk Integer BBT BBT
+mutual
+  data BBT : Type where
+    EmptyTree: BBT 
+    Leaf : Integer -> BBT 
+    Chunk : Integer -> (x: BBT ) ->  (y: BBT ) -> {auto p: (depth x) = (depth y)} ->  BBT 
+  
+  depth : BBT -> Nat
+  depth EmptyTree = 0
+  depth (Leaf x) = 1
+  depth (Chunk x y z) = 1 + ( max (depth y) (depth z))
 
-Show BBT where 
+Show (BBT ) where 
   show EmptyTree = "Empty Tree"
   show (Leaf n) = show n
   show (Chunk n bbt1 bbt2) = show n ++ " (" ++ show bbt1 ++ ") " ++  " (" ++ show bbt2 ++ ") "
 
-Eq BBT where 
+Eq (BBT ) where 
   (==) EmptyTree EmptyTree  = True
   (==) (Leaf x) (Leaf y)  = x == y 
   (==) (Chunk x y z) (Chunk w s t) = x == w && y == s && z == t
   (==) _ _ = False
 
-treeFromList : List Integer -> BBT
+
+-- TODO make total (recursion)
+treeFromList : List Integer -> BBT 
 treeFromList [] = EmptyTree
 treeFromList (x :: []) = Leaf x
 treeFromList (x :: (y :: [])) = ?lksjf
-treeFromList (x :: (y :: (z :: xs))) = Chunk x (Leaf y) (Leaf z)
+treeFromList (x :: xs) = 
+  let s = divNatNZ (length xs) 2 SIsNotZ 
+      ll = assert_total $ treeFromList (List.take s xs)
+      lr = assert_total $ treeFromList (List.drop s xs) in
+      case decEq (depth ll) (depth lr) of 
+           (Yes prf) => Chunk x ll lr
+           (No contra) => ?kjsdj_2
 
 main: IO ()
 main = spec $ do 
@@ -30,16 +47,15 @@ main = spec $ do
       treeFromList [1] `shouldBe` Leaf 1
     it "treeFromList with three elements" $ do
       treeFromList [1, 2, 3] `shouldBe` Chunk (1) (Leaf 2) (Leaf 3)
-
+    it "treeFromList with two elements" $ do
+      treeFromList [1..7] `shouldBe` Chunk (1) (Chunk 2 (Leaf 3) (Leaf 4)) (Chunk 5 (Leaf 6) (Leaf 7))
 
 emptyTree : BBT 
 emptyTree = EmptyTree
 
 incorrectTree : BBT
-incorrectTree = Chunk 1 (Chunk 2 (Leaf 3) EmptyTree) EmptyTree
+-- incorrectTree = Chunk 1 (Chunk 2 (Leaf 3) EmptyTree) EmptyTree
 
-
-counterProof : (contra : (n = fromInteger 3) -> Void) -> String
 
 -- toto : Integer -> String
 -- toto n = case (decEq n 3) of 
