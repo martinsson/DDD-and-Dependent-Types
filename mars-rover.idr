@@ -22,6 +22,18 @@ Coord = Vect 2 Integer -- perhaps this could be Fin of the board size
 IntDirection : Type
 IntDirection = Vect 2 Integer
 
+N : IntDirection
+N = [0, 1]
+
+W : IntDirection
+W = [-1, 0]
+
+S : IntDirection
+S = [0, -1]
+
+E : IntDirection
+E = [1, 0]
+
 data RoverState = MkPos Coord IntDirection 
   
 RoverAction: Type
@@ -33,20 +45,25 @@ Show RoverState where
     showDirection x = show (fromMaybe '$' (lookup x directions)) where
         directions : SortedMap IntDirection Char
         directions = fromList [
-          ([ 0,  1], 'N'),
-          ([-1,  0], 'W'),
-          ([ 0, -1], 'S'),
-          ([ 1,  0], 'E')]
+          (N, 'N'),
+          (W, 'W'),
+          (S, 'S'),
+          (E, 'E')]
 
 -- why can't there be some default implem?
 Eq RoverState where
   (==) (MkPos coord1 dir1) (MkPos coord2 dir2) = coord1 == coord2 && dir1 == dir2
 
+turn : (rotation: Matrix 2 2 Integer) -> IntDirection -> IntDirection 
+turn rotation direction = direction <\> rotation
+
+turnn : (rotation: Matrix 2 2 Integer) -> RoverState -> RoverState
+turnn rotation (MkPos coord direction) = let newDirection = direction <\> rotation in
+                                             MkPos coord newDirection
+
 turnLeft : RoverAction
-turnLeft (MkPos coord direction) = let newDir = direction <\> leftRotation in
-                                        MkPos coord newDir where
-  leftRotation : Matrix 2 2 Integer
-  leftRotation = [[0, 1], [-1, 0]] 
+turnLeft (MkPos coord direction) = let left = [[0, 1], [-1, 0]] in
+                                       MkPos coord (turn left direction)
 
 turnRight : RoverAction
 turnRight state = turnLeft $ turnLeft $ turnLeft state
@@ -75,18 +92,6 @@ moveRover state instructions = moveRoverHelper state (unpack instructions) where
   moveRoverHelper state (c :: cs) = let action = getRoverAction c in 
                                         moveRoverHelper (action state) cs
 
-
-N : IntDirection
-N = [0, 1]
-
-W : IntDirection
-W = [-1, 0]
-
-S : IntDirection
-S = [0, -1]
-
-E : IntDirection
-E = [1, 0]
 
 main: IO ()
 main = spec $ do 
