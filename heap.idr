@@ -1,3 +1,4 @@
+import Data.List.Views
 import Specdris.Spec
 
 %default total
@@ -30,13 +31,16 @@ treeFromList : List Integer -> BBT
 treeFromList [] = EmptyTree
 treeFromList (x :: []) = Leaf x
 treeFromList (x :: (y :: [])) = ?lksjf
-treeFromList (x :: xs) = 
-  let s = divNatNZ (length xs) 2 SIsNotZ 
-      ll = assert_total $ treeFromList (List.take s xs)
-      lr = assert_total $ treeFromList (List.drop s xs) in
-      case decEq (depth ll) (depth lr) of 
-           (Yes prf) => Chunk x ll lr
-           (No contra) => ?kjsdj_2
+treeFromList (x :: xs) = treeFromListHelper  (x :: xs)
+where
+  treeFromListHelper : List Integer -> BBT
+  treeFromListHelper xs with (splitBalanced xs)
+   treeFromListHelper (ys ++ zs) | (MkSplitBal y) = 
+     let ll = assert_total $ treeFromList ys
+         lr = assert_total $ treeFromList zs in
+         case decEq (depth ll) (depth lr) of 
+              (Yes prf) => Chunk x ll lr
+              (No contra) => ?kjsdj_2
 
 main: IO ()
 main = spec $ do 
