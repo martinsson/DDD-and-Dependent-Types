@@ -1,6 +1,7 @@
 import Specdris.Spec
 %default total
 
+-- TODO refactor out forty
 data NormalScore = Love | Fifteen | Thirty | Forty
 Show NormalScore where
   show Love = "Love"
