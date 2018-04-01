@@ -26,14 +26,17 @@ Show Player where
 data GameScore : Type where
   NormalGameScore : (NormalScore, NormalScore) -> GameScore
   Game            : Player -> GameScore
+  Deuce           : GameScore
 
 Show GameScore where
   show (NormalGameScore normalScoreTuple) = show normalScoreTuple
   show (Game player) = "Game " ++ show player
+  show Deuce = "Deuce"
 
 Eq GameScore where
   (==) (NormalGameScore x) (NormalGameScore y) = x == y
   (==) (Game x) (Game y) = x == y
+  (==) (Deuce) (Deuce) = True
   (==) _ _ = False
 
 nextscore : NormalScore -> NormalScore
@@ -47,6 +50,8 @@ score (a, b) P2 = (a, nextscore b)
 
 score2 : GameScore -> Player -> GameScore
 score2 (NormalGameScore (Forty, b)) P1 = Game P1
+score2 (NormalGameScore (Forty, Thirty)) P2 = Deuce
+score2 (NormalGameScore (Thirty, Forty)) P1 = Deuce
 score2 (NormalGameScore (a, Forty)) P2 = Game P2
 score2 (NormalGameScore normalScore) player = NormalGameScore $ score normalScore player
 score2 (Game x) y = ?score2_rhs_2
@@ -63,5 +68,5 @@ main = spec $ do
   describe "end of game" $ do
     it "is game after 40" $ do
       score2 (NormalGameScore (Forty, Thirty)) P1 `shouldBe` Game P1
-    -- it "is deuce when we have 40-40" $ do 
-      1 `shouldBe` 1
+    it "is deuce when we have 40-40" $ do 
+      score2 (NormalGameScore (Forty, Thirty)) P2 `shouldBe` Deuce
