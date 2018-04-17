@@ -1,11 +1,11 @@
 data Player = P1 | P2
-data PlayerScore = Love | Fifteen | Thirty | Forty
+data PlayerPoints = Love | Fifteen | Thirty | Forty
 
-data PointScore PlayerScore PlayerScore = MkPointScore p1Score p2Score
+data PointScore PlayerPoints PlayerPoints = MkPointScore p1Points p2Points
 
 mutual 
   data Deuce : Type where 
-    DeuceFromPoints : PointScore p1Score p2Score -> Deuce
+    DeuceFromPoints : PointScore p1Points p2Points -> Deuce
     DeuceFromAdvantage : Advantage player -> Deuce
   
   data Advantage : Player -> Type where
