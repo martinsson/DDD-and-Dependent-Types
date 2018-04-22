@@ -1,11 +1,11 @@
 data Player = P1 | P2
 data PlayerPoints = Love | Fifteen | Thirty | Forty
 
-data PointScore PlayerPoints PlayerPoints = MkPointScore PlayerPoints PlayerPoints
+data PointScore = MkPointScore PlayerPoints PlayerPoints
 
 mutual
   data Deuce : Type where 
-    DeuceFromPoints : PointScore p1Points p2Points -> Deuce
+    DeuceFromPoints : PointScore -> Deuce
     DeuceFromAdvantage : Advantage player -> Deuce
   
   data Advantage : Player -> Type where
@@ -14,9 +14,9 @@ mutual
   data Win : Player -> Type where
     WinFromAdvantage: Advantage player -> Win player
     -- TODO make this stricter
-    WinFromForty: PointScore PlayerPoints PlayerPoints -> (player: Player) -> Win player
+    WinFromForty: PointScore -> (player: Player) -> Win player
 
-data Score = WrapPointScore (PointScore PlayerPoints PlayerPoints) | 
+data Score = WrapPointScore (PointScore) | 
              WrapDeuce Deuce |
              WrapAdvantage (Advantage player) |
              WrapWin (Win player)
@@ -41,7 +41,7 @@ nextPoint Fifteen = Thirty
 nextPoint Thirty = Forty
 nextPoint Forty = Forty -- argh!
 
-NextScore (PointScore PlayerPoints PlayerPoints) where
+NextScore (PointScore) where
   nextScore (MkPointScore p1Points p2Points) ballWinner = nextPointScore p1Points p2Points ballWinner where
 
     nextPointScore : (p1Points : PlayerPoints) -> (p2Points : PlayerPoints) -> (ballWinner : Player) -> Score
