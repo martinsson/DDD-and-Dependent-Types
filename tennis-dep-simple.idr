@@ -40,11 +40,11 @@ NextScore (FortyOf player) where
 			then WrapWin (WinFromForty currentScore)
 			else WrapDeuce (DeuceFromForty currentScore) 
 
-NextScore (Advantage playerWithAdvantage) where
-  nextScore advantage@(MkAdvantage _ playerWithAdvantage) winnerOfBall = 
-    if playerWithAdvantage == winnerOfBall 
-       then WrapWin (WinFromAdvantage advantage)
-       else WrapDeuce (DeuceFromAdvantage advantage)
+NextScore (Advantage player) where
+  nextScore currentScore@(MkAdvantage _ player) winnerOfBall = 
+    if player == winnerOfBall 
+       then WrapWin (WinFromAdvantage currentScore)
+       else WrapDeuce (DeuceFromAdvantage currentScore)
   
 NextScore (PointScore) where
   nextScore (MkPointScore p1Points p2Points) ballWinner = nextPointScore p1Points p2Points ballWinner where
