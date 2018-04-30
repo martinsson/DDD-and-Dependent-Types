@@ -1,4 +1,12 @@
 %default total 
+-- The types expresses the state-pattern of Tennis, the Type constructors take the
+-- previous score as an argument hence disallowing illegal state transitions
+-- some transitions use dependent types to enforce that it is only the player
+-- who had the advantage that can win after the next ball.
+
+-- All types are disjoint, i.e. instead of making one type GameScore and many type constructors
+-- which feels like inheritance. Here we use composition of types, this strategy seems more extensible
+-- (not that tennis is ever going to be extended...) 
 
 data Player = P1 | P2
 Eq Player where
@@ -25,6 +33,7 @@ mutual
     WinFromAdvantage: Advantage player -> Win player
     WinFromForty: FortyOf player -> Win player
 
+-- I find this syntax for an Union type really horrible and clunky
 data Score = WrapPointScore (PointScore) | 
 						 WrapForty (FortyOf player) | 
              WrapDeuce Deuce |
