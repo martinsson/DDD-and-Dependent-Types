@@ -1,6 +1,11 @@
 %default total 
 
 data Player = P1 | P2
+Eq Player where
+  (==) P1 P1 = True
+  (==) P2 P2 = True
+  (==) _  _  = False 
+
 data PlayerPoints = Love | Fifteen | Thirty 
 
 data PointScore = MkPointScore PlayerPoints PlayerPoints
@@ -26,19 +31,14 @@ data Score = WrapPointScore (PointScore) |
              WrapAdvantage (Advantage player) |
              WrapWin (Win player)
 
-Eq Player where
-  (==) P1 P1 = True
-  (==) P2 P2 = True
-  (==) _  _  = False 
-
 interface NextScore currentScore where
   nextScore : currentScore -> Player -> Score
 
 NextScore (FortyOf player) where
   nextScore currentScore@(MkForty player) ballWinner = 
-																				if player == ballWinner 
-																					then WrapWin (WinFromForty currentScore)
-																					else WrapDeuce (DeuceFromForty currentScore) 
+		if player == ballWinner 
+			then WrapWin (WinFromForty currentScore)
+			else WrapDeuce (DeuceFromForty currentScore) 
 
 NextScore (Advantage playerWithAdvantage) where
   nextScore advantage@(MkAdvantage _ playerWithAdvantage) winnerOfBall = 
