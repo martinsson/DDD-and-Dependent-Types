@@ -35,7 +35,7 @@ mutual
 
 -- I find this syntax for an Union type really horrible and clunky
 data Score = WrapPointScore (PointScore) | 
-						 WrapForty (FortyOf player) | 
+             WrapForty (FortyOf player) | 
              WrapDeuce Deuce |
              WrapAdvantage (Advantage player) |
              WrapWin (Win player)
@@ -79,7 +79,7 @@ score ballWins = let initialScore = (WrapPointScore (MkPointScore Love Love)) in
   applyScore (WrapForty currentScore) ballWinner      = nextScore currentScore ballWinner
   applyScore (WrapDeuce currentScore) ballWinner      = WrapAdvantage (MkAdvantage currentScore ballWinner)
   applyScore (WrapAdvantage currentScore) ballWinner  = nextScore currentScore ballWinner
-  applyScore (WrapWin y) ballWinner 									= WrapWin y
+  applyScore (WrapWin y) ballWinner                   = WrapWin y
   
   scoreHelper : (currentScore: Score) -> List Player -> Score
   scoreHelper currentScore []        = currentScore
