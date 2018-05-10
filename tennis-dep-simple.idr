@@ -21,20 +21,23 @@ nextPoint Love    = Fifteen
 nextPoint Fifteen = Thirty
 nextPoint Thirty  = Thirty
 
+||| I wonder why we need to use the full form of type definition and why the
+||| simpler form doesn't work i.e.
+||| data PointScore PlayerPoints PlayerPoints = MkPointScore p1Points p2Points
 data PointScore : PlayerPoints -> PlayerPoints -> Type where
      MkPointScore: (p1Points: PlayerPoints) -> (p2Points: PlayerPoints) ->
                    PointScore p1Points p2Points
 
--- data PointScore PlayerPoints PlayerPoints = MkPointScore p1Points p2Points
-
+-- I don't think is a good idea any more, It allows for less cardinality as it
+-- removes one case from the type of highest cardinality, but it's not a concept
+-- from the domain.
 data FortyOf : Player -> Type where
     MkFortyP1 : (PointScore Thirty p2points) -> FortyOf P1
     MkFortyP2 : (PointScore p1Points Thirty) -> FortyOf P2
 
 mutual
-  data Deuce : Type where 
-    DeuceFromForty : FortyOf player -> Deuce
-    DeuceFromAdvantage : Advantage player -> Deuce
+  data Deuce = DeuceFromForty (FortyOf player) | 
+               DeuceFromAdvantage (Advantage player)
   
   data Advantage : Player -> Type where
     MkAdvantage: Deuce -> (player: Player) -> Advantage player
@@ -43,13 +46,19 @@ mutual
     WinFromAdvantage: Advantage player -> Win player
     WinFromForty: FortyOf player -> Win player
 
--- I find this syntax for an Union type really horrible and clunky
+||| All types are disjoint, so we need a Union type in order to define a
+||| function on any type of score.
+||| BTW I find this syntax for an Union type really horrible and clunky
 data Score = WrapPointScore (PointScore p1Points p2Points) | 
              WrapForty (FortyOf player) | 
              WrapDeuce Deuce |
              WrapAdvantage (Advantage player) |
              WrapWin (Win player)
 
+||| type-class or polymorphic function that calculates the next score based on
+||| the current and the player. Could be implemented also for Win and Deuce but
+||| their implementation is trivial so it is more concise to inline the code in
+||| the function applyNextScore below
 interface NextScore currentScore where
   nextScore : currentScore -> Player -> Score
 
@@ -71,18 +80,19 @@ NextScore (PointScore p1Points p2Points) where
 
 score : (ballWins: List Player) -> Score
 score ballWins = let initialScore = (WrapPointScore (MkPointScore Love Love)) in 
-                     scoreHelper initialScore ballWins where 
+                     scoreHelper ballWins initialScore where 
  
-  applyNextScore : Score -> Player -> Score
-  applyNextScore (WrapPointScore currentScore) ballWinner = nextScore currentScore ballWinner
-  applyNextScore (WrapForty currentScore) ballWinner      = nextScore currentScore ballWinner
-  applyNextScore (WrapDeuce currentScore) ballWinner      = WrapAdvantage (MkAdvantage currentScore ballWinner)
-  applyNextScore (WrapAdvantage currentScore) ballWinner  = nextScore currentScore ballWinner
-  applyNextScore (WrapWin currentScore) _                 = WrapWin currentScore
+  applyNextScore : Player -> Score -> Score
+  applyNextScore ballWinner (WrapPointScore currentScore) = nextScore currentScore ballWinner
+  applyNextScore ballWinner (WrapForty currentScore)      = nextScore currentScore ballWinner
+  applyNextScore ballWinner (WrapDeuce currentScore)      = WrapAdvantage (MkAdvantage currentScore ballWinner)
+  applyNextScore ballWinner (WrapAdvantage currentScore)  = nextScore currentScore ballWinner
+  applyNextScore ballWinner (WrapWin currentScore)        = WrapWin currentScore
   
-  scoreHelper : Score -> List Player -> Score
-  scoreHelper score []                          = score
-  scoreHelper score (ballWinner :: ballWinners) = scoreHelper (applyNextScore score ballWinner) ballWinners
+  -- recursive version of the score function
+  scoreHelper : (ballWinners: List Player) -> Score -> Score
+  scoreHelper [] score                          = score
+  scoreHelper (ballWinner :: ballWinners) score = scoreHelper ballWinners $ applyNextScore ballWinner score
 
 
 
