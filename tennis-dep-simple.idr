@@ -28,9 +28,11 @@ data PointScore : PlayerPoints -> PlayerPoints -> Type where
      MkPointScore: (p1Points: PlayerPoints) -> (p2Points: PlayerPoints) ->
                    PointScore p1Points p2Points
 
--- I don't think is a good idea any more, It allows for less cardinality as it
--- removes one case from the type of highest cardinality, but it's not a concept
--- from the domain.
+||| This type, representing the fact that one player has reached Forty allows to
+||| reduce cardinality (=~ cyclomatic complexity) of the nextScore on PointScore
+||| as in this case we have only two possibilities: FortyOf player or another
+||| PointScore. Without this type we'd have three possibilites : Deuce, Win
+||| or another PointScore
 data FortyOf : Player -> Type where
     MkFortyP1 : (PointScore Thirty p2points) -> FortyOf P1
     MkFortyP2 : (PointScore p1Points Thirty) -> FortyOf P2
