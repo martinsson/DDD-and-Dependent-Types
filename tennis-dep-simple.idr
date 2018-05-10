@@ -16,10 +16,20 @@ Eq Player where
 
 data PlayerPoints = Love | Fifteen | Thirty 
 
-data PointScore = MkPointScore PlayerPoints PlayerPoints
+nextPoint : PlayerPoints -> PlayerPoints 
+nextPoint Love    = Fifteen
+nextPoint Fifteen = Thirty
+nextPoint Thirty  = Thirty
+
+data PointScore : PlayerPoints -> PlayerPoints -> Type where
+     MkPointScore: (p1Points: PlayerPoints) -> (p2Points: PlayerPoints) ->
+                   PointScore p1Points p2Points
+
+-- data PointScore PlayerPoints PlayerPoints = MkPointScore p1Points p2Points
 
 data FortyOf : Player -> Type where
-    MkForty : (player: Player) -> FortyOf player
+    MkFortyP1 : (PointScore Thirty p2points) -> FortyOf P1
+    MkFortyP2 : (PointScore p1Points Thirty) -> FortyOf P2
 
 mutual
   data Deuce : Type where 
@@ -34,7 +44,7 @@ mutual
     WinFromForty: FortyOf player -> Win player
 
 -- I find this syntax for an Union type really horrible and clunky
-data Score = WrapPointScore (PointScore) | 
+data Score = WrapPointScore (PointScore p1Points p2Points) | 
              WrapForty (FortyOf player) | 
              WrapDeuce Deuce |
              WrapAdvantage (Advantage player) |
@@ -44,46 +54,35 @@ interface NextScore currentScore where
   nextScore : currentScore -> Player -> Score
 
 NextScore (FortyOf player) where
-  nextScore currentScore@(MkForty player) ballWinner = 
-		if player == ballWinner 
-			then WrapWin (WinFromForty currentScore)
-			else WrapDeuce (DeuceFromForty currentScore) 
+  nextScore currentScore P1 {player = P1} = WrapWin (WinFromForty currentScore)
+  nextScore currentScore P2 {player = P2} = WrapWin (WinFromForty currentScore)
+  nextScore currentScore _                = WrapDeuce (DeuceFromForty currentScore)
 
 NextScore (Advantage player) where
-  nextScore currentScore@(MkAdvantage _ player) winnerOfBall = 
-    if player == winnerOfBall 
-       then WrapWin (WinFromAdvantage currentScore)
-       else WrapDeuce (DeuceFromAdvantage currentScore)
+  nextScore currentScore P1 {player = P1} = WrapWin (WinFromAdvantage currentScore)
+  nextScore currentScore P2 {player = P2} = WrapWin (WinFromAdvantage currentScore)
+  nextScore currentScore _                = WrapDeuce (DeuceFromAdvantage currentScore)
   
-NextScore (PointScore) where
-  nextScore (MkPointScore p1Points p2Points) ballWinner = nextPointScore p1Points p2Points ballWinner where
-
-    nextPoint : PlayerPoints -> PlayerPoints 
-    nextPoint Love    = Fifteen
-    nextPoint Fifteen = Thirty
-    nextPoint Thirty  = Thirty
-
-    nextPointScore : (p1Points : PlayerPoints) -> (p2Points : PlayerPoints) -> (ballWinner : Player) -> Score
-    nextPointScore   Thirty       _  P1 = WrapForty (MkForty P1) 
-    nextPointScore        _   Thirty P2 = WrapForty (MkForty P2) 
-    nextPointScore p1Points p2Points P1 = WrapPointScore (MkPointScore (nextPoint p1Points) p2Points)
-    nextPointScore p1Points p2Points P2 = WrapPointScore (MkPointScore p1Points (nextPoint p2Points))
-  
+NextScore (PointScore p1Points p2Points) where
+  nextScore currentScore@(MkPointScore Thirty p2Points) ballWinner {p1Points = Thirty} = WrapForty (MkFortyP1 currentScore)
+  nextScore currentScore@(MkPointScore p1Points Thirty) ballWinner {p2Points = Thirty} = WrapForty (MkFortyP2 currentScore)
+  nextScore currentScore P1 {p1Points} {p2Points} = WrapPointScore (MkPointScore (nextPoint p1Points) p2Points)
+  nextScore currentScore P2 {p1Points} {p2Points} = WrapPointScore (MkPointScore p1Points (nextPoint p2Points))
 
 score : (ballWins: List Player) -> Score
 score ballWins = let initialScore = (WrapPointScore (MkPointScore Love Love)) in 
                      scoreHelper initialScore ballWins where 
  
-  applyScore : Score -> Player -> Score
-  applyScore (WrapPointScore currentScore) ballWinner = nextScore currentScore ballWinner
-  applyScore (WrapForty currentScore) ballWinner      = nextScore currentScore ballWinner
-  applyScore (WrapDeuce currentScore) ballWinner      = WrapAdvantage (MkAdvantage currentScore ballWinner)
-  applyScore (WrapAdvantage currentScore) ballWinner  = nextScore currentScore ballWinner
-  applyScore (WrapWin y) ballWinner                   = WrapWin y
+  applyNextScore : Score -> Player -> Score
+  applyNextScore (WrapPointScore currentScore) ballWinner = nextScore currentScore ballWinner
+  applyNextScore (WrapForty currentScore) ballWinner      = nextScore currentScore ballWinner
+  applyNextScore (WrapDeuce currentScore) ballWinner      = WrapAdvantage (MkAdvantage currentScore ballWinner)
+  applyNextScore (WrapAdvantage currentScore) ballWinner  = nextScore currentScore ballWinner
+  applyNextScore (WrapWin currentScore) _                 = WrapWin currentScore
   
-  scoreHelper : (currentScore: Score) -> List Player -> Score
-  scoreHelper currentScore []        = currentScore
-  scoreHelper currentScore (y :: xs) = scoreHelper (applyScore currentScore y) xs
+  scoreHelper : Score -> List Player -> Score
+  scoreHelper score []                          = score
+  scoreHelper score (ballWinner :: ballWinners) = scoreHelper (applyNextScore score ballWinner) ballWinners
 
 
 
