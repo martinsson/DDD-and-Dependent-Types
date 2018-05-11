@@ -50,7 +50,8 @@ mutual
 
 ||| All types are disjoint, so we need a Union type in order to define a
 ||| function on any type of score.
-||| BTW I find this syntax for an Union type really horrible and clunky
+||| BTW I'm curious as to why we can't define score as a type alias, like an 
+||| OR-type find wrapping and unwrapping of the Union type really cumbersome
 data Score = WrapPointScore (PointScore p1Points p2Points) | 
              WrapForty (FortyOf player) | 
              WrapDeuce Deuce |
@@ -58,9 +59,9 @@ data Score = WrapPointScore (PointScore p1Points p2Points) |
              WrapWin (Win player)
 
 ||| type-class or polymorphic function that calculates the next score based on
-||| the current and the player. Could be implemented also for Win and Deuce but
-||| their implementation is trivial so it is more concise to inline the code in
-||| the function applyNextScore below
+||| the current and the player that won the ball. Could be implemented also for
+||| Win and Deuce but their implementation is trivial so it is more concise to
+||| inline the code in the function applyNextScore below
 interface NextScore currentScore where
   nextScore : currentScore -> Player -> Score
 
