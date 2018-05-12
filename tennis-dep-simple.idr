@@ -75,9 +75,9 @@ NextScore (Advantage player) where
   nextScore currentScore _                = WrapDeuce (DeuceFromAdvantage currentScore)
   
 NextScore (PointScore p1Points p2Points) where
-  nextScore currentScore@(MkPointScore Thirty Thirty) player {p1Points = Thirty} {p2Points = Thirty }= WrapForty (MkForty currentScore player)
-  nextScore currentScore P1 {p1Points} {p2Points} = WrapPointScore (MkPointScore (nextPoint p1Points) p2Points)
-  nextScore currentScore P2 {p1Points} {p2Points} = WrapPointScore (MkPointScore p1Points (nextPoint p2Points))
+  nextScore currentScore player {p1Points = Thirty} {p2Points = Thirty} = WrapForty (MkForty currentScore player)
+  nextScore currentScore P1     {p1Points}          {p2Points}          = WrapPointScore (MkPointScore (nextPoint p1Points) p2Points)
+  nextScore currentScore P2     {p1Points}          {p2Points}          = WrapPointScore (MkPointScore p1Points (nextPoint p2Points))
 
 score : (ballWins: List Player) -> Score
 score ballWins = let initialScore = (WrapPointScore (MkPointScore Love Love)) in 
