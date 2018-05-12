@@ -34,8 +34,8 @@ data PointScore : PlayerPoints -> PlayerPoints -> Type where
 ||| PointScore. Without this type we'd have three possibilites : Deuce, Win
 ||| or another PointScore
 data FortyOf : Player -> Type where
-    MkFortyP1 : (PointScore Thirty p2points) -> FortyOf P1
-    MkFortyP2 : (PointScore p1Points Thirty) -> FortyOf P2
+    MkFortyP1 : (PointScore Thirty Thirty) -> FortyOf P1
+    MkFortyP2 : (PointScore Thirty Thirty) -> FortyOf P2
 
 mutual
   data Deuce = DeuceFromForty (FortyOf player) | 
@@ -76,8 +76,8 @@ NextScore (Advantage player) where
   nextScore currentScore _                = WrapDeuce (DeuceFromAdvantage currentScore)
   
 NextScore (PointScore p1Points p2Points) where
-  nextScore currentScore@(MkPointScore Thirty p2Points) ballWinner {p1Points = Thirty} = WrapForty (MkFortyP1 currentScore)
-  nextScore currentScore@(MkPointScore p1Points Thirty) ballWinner {p2Points = Thirty} = WrapForty (MkFortyP2 currentScore)
+  nextScore currentScore@(MkPointScore Thirty Thirty) P1 {p1Points = Thirty} {p2Points = Thirty }= WrapForty (MkFortyP1 currentScore)
+  nextScore currentScore@(MkPointScore Thirty Thirty) P2 {p1Points = Thirty} {p2Points = Thirty}= WrapForty (MkFortyP2 currentScore)
   nextScore currentScore P1 {p1Points} {p2Points} = WrapPointScore (MkPointScore (nextPoint p1Points) p2Points)
   nextScore currentScore P2 {p1Points} {p2Points} = WrapPointScore (MkPointScore p1Points (nextPoint p2Points))
 
