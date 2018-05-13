@@ -29,16 +29,14 @@ data PointScore : PlayerPoints -> PlayerPoints -> Type where
                    PointScore p1Points p2Points
 
 ||| This type, representing the fact that one player has reached Forty allows to
-||| reduce cardinality (=~ cyclomatic complexity) of the nextScore on PointScore
-||| as in this case we have only two possibilities: FortyOf player or another
-||| PointScore. Without this type we'd have three possibilites : Deuce, Win
-||| or another PointScore
+||| reduce cardinality (=~ cyclomatic complexity) of the implementation of nextScore
+||| for PointScore below. PointScore already has to deal with the different 
+||| PlayerPoints.  
 data GameBall : Player -> PlayerPoints -> Type where
   FromThirtyP1 : (PointScore Thirty p2Points) -> GameBall P1 p2Points
   FromThirtyP2 : (PointScore p1Points Thirty) -> GameBall P2 p1Points
   FromGameBall : (GameBall player otherPlayerPoints) ->
                  GameBall player (nextPoint otherPlayerPoints)
-  -- FromDeuce    : Deuce -> (player: Player) -> GameBall player ???
 
 mutual
   data Deuce = DeuceFromGameBall (GameBall player op) | 
@@ -90,11 +88,11 @@ score ballWins = let initialScore = (WrapPointScore (MkPointScore Love Love)) in
                      scoreHelper ballWins initialScore where 
  
   applyNextScore : Player -> Score -> Score
-  applyNextScore ballWinner (WrapPointScore currentScore)                = nextScore currentScore ballWinner
-  applyNextScore ballWinner (WrapGameBall currentScore ) = nextScore currentScore ballWinner
-  applyNextScore ballWinner (WrapDeuce currentScore)                     = WrapAdvantage (MkAdvantage currentScore ballWinner)
-  applyNextScore ballWinner (WrapAdvantage currentScore)                 = nextScore currentScore ballWinner
-  applyNextScore ballWinner (WrapWin currentScore)                       = WrapWin currentScore
+  applyNextScore ballWinner (WrapPointScore currentScore) = nextScore currentScore ballWinner
+  applyNextScore ballWinner (WrapGameBall currentScore )  = nextScore currentScore ballWinner
+  applyNextScore ballWinner (WrapDeuce currentScore)      = WrapAdvantage (MkAdvantage currentScore ballWinner)
+  applyNextScore ballWinner (WrapAdvantage currentScore)  = nextScore currentScore ballWinner
+  applyNextScore ballWinner (WrapWin currentScore)        = WrapWin currentScore
   
   -- recursive version of the score function
   scoreHelper : (ballWinners: List Player) -> Score -> Score
