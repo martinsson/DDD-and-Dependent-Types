@@ -15,21 +15,20 @@ tennisPoint : Integer -> String
 tennisPoint 0 = "love"
 tennisPoint 1 = "fifteen"
 tennisPoint 2 = "thirty"
-tennisPoint _ = "forty"
+tennisPoint 3 = "forty"
+tennisPoint _ = "impossible!!"
 
 Show Score where
   show (MkScore p1Score p2Score) = let diff = p1Score - p2Score 
                                        isInPlayoff = p1Score >= 3 && p2Score >= 3 in
     if isInPlayoff then 
-      case (p1Score, p2Score, diff) of
-           (3, 3, _) => "deuce"
-           (4, 4, _) => "deuce"
-           (4, 3, 1) => "advantage player1"
-           (6, 5, 1) => "advantage player1"
-           (3, 4, _) => "advantage player2"
-           (5, 3, _) => "game player1"
-           (4, 6, _) => "game player2"
-           (_, _, _) => "unexpected"
+      case diff + 2 of  -- bug? in parser cant match on negative values 
+           4 => "game player1"
+           3 => "advantage player1"
+           2 => "deuce"
+           1 => "advantage player2"
+           0 => "game player2"
+           _ => "impossible!!"
     else
       case (p1Score, p2Score, diff >= 2, diff <= -2) of
            (4, _, True, _) => "game player1"
