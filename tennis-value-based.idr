@@ -18,10 +18,23 @@ tennisPoint 2 = "thirty"
 tennisPoint _ = "forty"
 
 Show Score where
-  show (MkScore p1Score p2Score) = let diff = p1Score - p2Score in
-    case (p1Score, p2Score, diff) of
-         (3, 3, _) => "deuce"
-         (p1, p2, _) =>  tennisPoint p1 ++ "-" ++ tennisPoint p2
+  show (MkScore p1Score p2Score) = let diff = p1Score - p2Score 
+                                       isInPlayoff = p1Score >= 3 && p2Score >= 3 in
+    if isInPlayoff then 
+      case (p1Score, p2Score, diff) of
+           (3, 3, _) => "deuce"
+           (4, 4, _) => "deuce"
+           (4, 3, 1) => "advantage player1"
+           (6, 5, 1) => "advantage player1"
+           (3, 4, _) => "advantage player2"
+           (5, 3, _) => "game player1"
+           (4, 6, _) => "game player2"
+           (_, _, _) => "unexpected"
+    else
+      case (p1Score, p2Score, diff >= 2, diff <= -2) of
+           (4, _, True, _) => "game player1"
+           (_, 4, _, True) => "game player2"
+           (p1, p2, _, _) =>  tennisPoint p1 ++ "-" ++ tennisPoint p2
 
 score : List Player -> String
 score ballWinners = show $ scoreValue ballWinners
@@ -38,4 +51,22 @@ main = spec $ do
   describe "deuce" $ do
 		it "handles deuce from points" $ 
 			score [P1, P1, P1, P2, P2, P2] `shouldBe` "deuce"
+		it "handles deuce from advantage" $ 
+			score [P1, P1, P1, P2, P2, P2, P2, P1] `shouldBe` "deuce"
+  describe "advantage" $ do
+    it "handles P1" $
+			score [P1, P1, P1, P2, P2, P2, P1] `shouldBe` "advantage player1"
+    it "handles P2" $
+			score [P1, P1, P1, P2, P2, P2, P2] `shouldBe` "advantage player2"
+    it "handles long games" $
+			score [P1, P1, P1, P2, P2, P2, P1, P2, P1, P2, P1] `shouldBe` "advantage player1"
+  describe "win" $ do
+    it "handles game ball P1" $
+      score [P1, P1, P1, P1] `shouldBe` "game player1"
+    it "handles game ball P2" $
+      score [P2, P2, P2, P2] `shouldBe` "game player2"
+    it "handles game ball from advantage" $
+      score [P1, P1, P1, P2, P2, P2, P1, P1] `shouldBe` "game player1"
+    it "handles game ball P2" $
+      score [P1, P1, P1, P2, P2, P2, P1, P2, P2, P2] `shouldBe` "game player2"
  
