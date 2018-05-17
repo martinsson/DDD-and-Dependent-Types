@@ -38,6 +38,12 @@ Show Score where
 score : List Player -> String
 score ballWinners = show $ scoreValue ballWinners
 
+partial testDeuce: (x: Integer) -> show (MkScore x x) = "deuce"
+testDeuce 3 = Refl
+testDeuce 4 = Refl
+testDeuce 11 = Refl
+
+
 main: IO ()
 main = spec $ do
   describe "normal score" $ do

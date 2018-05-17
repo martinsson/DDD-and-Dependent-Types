@@ -16,10 +16,10 @@ Eq Player where
 
 data PlayerPoints = Love | Fifteen | Thirty 
 
-nextPoint : PlayerPoints -> PlayerPoints 
+nextPoint : (playerPoint: PlayerPoints) -> PlayerPoints -- -> {prf: (playerPoint = Thirty) 
 nextPoint Love    = Fifteen
 nextPoint Fifteen = Thirty
-nextPoint Thirty  = Thirty
+nextPoint Thirty  = Thirty -- TODO impossible
 
 ||| I wonder why we need to use the full form of type definition and why the
 ||| simpler form doesn't work i.e.
@@ -35,7 +35,7 @@ data PointScore : PlayerPoints -> PlayerPoints -> Type where
 data GameBall : Player -> PlayerPoints -> Type where
   FromThirtyP1 : (PointScore Thirty p2Points) -> GameBall P1 p2Points
   FromThirtyP2 : (PointScore p1Points Thirty) -> GameBall P2 p1Points
-  FromGameBall : (GameBall player otherPlayerPoints) ->
+  FromGameBall : (GameBall player otherPlayerPoints) -> -- here use the proof of not thirty
                  GameBall player (nextPoint otherPlayerPoints)
 
 mutual
@@ -58,6 +58,13 @@ data Score = WrapPointScore (PointScore p1Points p2Points) |
              WrapDeuce Deuce |
              WrapAdvantage (Advantage player) |
              WrapWin (Win player)
+
+Show Score where 
+  show (WrapPointScore x) = ?Show_rhs_2
+  show (WrapGameBall x) = ?Show_rhs_3
+  show (WrapDeuce x) = "deuce"
+  show (WrapAdvantage x) = ?Show_rhs_5
+  show (WrapWin x) = ?Show_rhs_6
 
 ||| type-class or polymorphic function that calculates the next score based on
 ||| the current and the player that won the ball. Could be implemented also for
@@ -99,7 +106,15 @@ score ballWins = let initialScore = (WrapPointScore (MkPointScore Love Love)) in
   scoreHelper [] score                          = score
   scoreHelper (ballWinner :: ballWinners) score = scoreHelper ballWinners $ applyNextScore ballWinner score
 
+-- Tests ---
+deuceIsEqualityAfter3PointsEach : show (score (take 6 $ cycle [P1, P2])) = "deuce" 
+deuceIsEqualityAfter3PointsEach = Refl
 
-
+partial
+deuceIsEqualityAfter3PointsEach1 : (pointsEach: Nat) -> {p: LT pointsEach 100} -> show (score (join (replicate (3 + pointsEach)  [P1, P2] ))) = "deuce" 
+deuceIsEqualityAfter3PointsEach1 Z = Refl
+deuceIsEqualityAfter3PointsEach1 (S Z) = Refl
+deuceIsEqualityAfter3PointsEach1 (S (S Z)) = Refl
+deuceIsEqualityAfter3PointsEach1 (S (S (S Z))) = ?deuceIsEqualityAfter3PointsEach1_rhs1_5
 
 
