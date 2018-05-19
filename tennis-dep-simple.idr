@@ -106,15 +106,18 @@ score ballWins = let initialScore = (WrapPointScore (MkPointScore Love Love)) in
   scoreHelper [] score                          = score
   scoreHelper (ballWinner :: ballWinners) score = scoreHelper ballWinners $ applyNextScore ballWinner score
 
+
+showScore : List Player -> String
+showScore xs = show $ score xs
+
 -- Tests ---
-deuceIsEqualityAfter3PointsEach : show (score (take 6 $ cycle [P1, P2])) = "deuce" 
-deuceIsEqualityAfter3PointsEach = Refl
 
 partial
-deuceIsEqualityAfter3PointsEach1 : (pointsEach: Nat) -> {p: LT pointsEach 100} -> show (score (join (replicate (3 + pointsEach)  [P1, P2] ))) = "deuce" 
+deuceIsEqualityAfter3PointsEach1 : (pointsEach: Nat ) -> showScore (join (replicate (3 + pointsEach)  [P1, P2] )) = "deuce" 
 deuceIsEqualityAfter3PointsEach1 Z = Refl
 deuceIsEqualityAfter3PointsEach1 (S Z) = Refl
 deuceIsEqualityAfter3PointsEach1 (S (S Z)) = Refl
-deuceIsEqualityAfter3PointsEach1 (S (S (S Z))) = ?deuceIsEqualityAfter3PointsEach1_rhs1_5
+deuceIsEqualityAfter3PointsEach1 (S (S (S Z))) = Refl
+deuceIsEqualityAfter3PointsEach1 (S (S (S (S Z)))) = Refl
 
 
