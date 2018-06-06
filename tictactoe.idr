@@ -58,8 +58,8 @@ parseAvailablePos freePos (r, c) =
     (Just row, Just col) => let validPos = (row, col) in  
                                 (case isElem validPos freePos of 
                                       (Yes posIsFree) => Either.Right (validPos ** posIsFree)
-                                      (No contra) => Either.Left "position is not free")
-    (_, _)               => Either.Left "input cannot be parsed to a row and column"
+                                      (No contra) => Either.Left " ==> position is not free")
+    (_, _)               => Either.Left " ==> input cannot be parsed to a row and column"
 
 availablePos : Vect 2 Pos
 availablePos = [(Upper, Left), (Bottom, Left)] 
@@ -88,7 +88,9 @@ strictMain = do
   c <- getLine
   case parseAvailablePos availablePos (r, c) of
        (Left error) => putStrLn error
-       (Right success) => putStrLn $ "OK occupying position " ++ (show (r, c) ) 
+       (Right success) => let (p ** prf) = success 
+                              result = placeMark availablePos p prf in do
+         putStrLn $ "OK occupying position " ++ (show (r, c) ) 
   putStrLn ""
   strictMain
 
