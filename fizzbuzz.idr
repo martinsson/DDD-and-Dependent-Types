@@ -7,6 +7,7 @@ fizzbuzz a = case [mod a 3, mod a 5] of
                 [_, Z] => "Buzz"
                 _ => show a 
 
+
 main : IO ()
 main = spec $ do
   describe "fizzbuzz" $ do
