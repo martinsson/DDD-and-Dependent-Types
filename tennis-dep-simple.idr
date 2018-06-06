@@ -15,6 +15,10 @@ Eq Player where
   (==) _  _  = False 
 
 data PlayerPoints = Love | Fifteen | Thirty 
+Show PlayerPoints where
+  show Love = "0"
+  show Fifteen = "15"
+  show Thirty = "30"
 
 nextPoint : (playerPoint: PlayerPoints) -> PlayerPoints -- -> {prf: (playerPoint = Thirty) 
 nextPoint Love    = Fifteen
@@ -60,7 +64,7 @@ data Score = WrapPointScore (PointScore p1Points p2Points) |
              WrapWin (Win player)
 
 Show Score where 
-  show (WrapPointScore x) = ?Show_rhs_2
+  show (WrapPointScore (MkPointScore p1Points p2Points)) = show p1Points ++ " - " ++ show p2Points
   show (WrapGameBall x) = ?Show_rhs_3
   show (WrapDeuce x) = "deuce"
   show (WrapAdvantage x) = ?Show_rhs_5
@@ -89,28 +93,30 @@ NextScore (PointScore p1Points p2Points) where
   nextScore currentScore P2 {p2Points = Thirty}   = WrapGameBall (FromThirtyP2 currentScore)
   nextScore currentScore P1 {p1Points} {p2Points} = WrapPointScore (MkPointScore (nextPoint p1Points) p2Points)
   nextScore currentScore P2 {p1Points} {p2Points} = WrapPointScore (MkPointScore p1Points (nextPoint p2Points))
+  
+-- recursive version of the score function
+scoreHelper : (ballWinners: List Player) -> Score -> Score
+scoreHelper [] score                          = score
+scoreHelper (ballWinner :: ballWinners) score = scoreHelper ballWinners $ applyNextScore ballWinner score where
 
-score : (ballWins: List Player) -> Score
-score ballWins = let initialScore = (WrapPointScore (MkPointScore Love Love)) in 
-                     scoreHelper ballWins initialScore where 
- 
   applyNextScore : Player -> Score -> Score
   applyNextScore ballWinner (WrapPointScore currentScore) = nextScore currentScore ballWinner
   applyNextScore ballWinner (WrapGameBall currentScore )  = nextScore currentScore ballWinner
   applyNextScore ballWinner (WrapDeuce currentScore)      = WrapAdvantage (MkAdvantage currentScore ballWinner)
   applyNextScore ballWinner (WrapAdvantage currentScore)  = nextScore currentScore ballWinner
   applyNextScore ballWinner (WrapWin currentScore)        = WrapWin currentScore
-  
-  -- recursive version of the score function
-  scoreHelper : (ballWinners: List Player) -> Score -> Score
-  scoreHelper [] score                          = score
-  scoreHelper (ballWinner :: ballWinners) score = scoreHelper ballWinners $ applyNextScore ballWinner score
 
-
+score : (ballWins: List Player) -> Score
+score ballWins = let initialScore = (WrapPointScore (MkPointScore Love Love)) in 
+                     scoreHelper ballWins initialScore 
+ 
 showScore : List Player -> String
 showScore xs = show $ score xs
 
 -- Tests ---
+
+aSimpleScore : showScore [P1, P2, P2] = "15 - 30"
+aSimpleScore = Refl
 
 partial
 deuceIsEqualityAfter3PointsEach1 : (pointsEach: Nat ) -> showScore (join (replicate (3 + pointsEach)  [P1, P2] )) = "deuce" 
@@ -119,5 +125,24 @@ deuceIsEqualityAfter3PointsEach1 (S Z) = Refl
 deuceIsEqualityAfter3PointsEach1 (S (S Z)) = Refl
 deuceIsEqualityAfter3PointsEach1 (S (S (S Z))) = Refl
 deuceIsEqualityAfter3PointsEach1 (S (S (S (S Z)))) = Refl
+
+partial
+deuceIsEqualityAfter3PointsEach : (pointsEach: Nat ) -> (prf: LTE pointsEach 2) -> showScore (join (replicate (3 + pointsEach)  [P1, P2] )) = "deuce" 
+deuceIsEqualityAfter3PointsEach Z prf = Refl
+deuceIsEqualityAfter3PointsEach (S k) _ with (compare (S k) k) proof prf
+  deuceIsEqualityAfter3PointsEach (S k) _ | EQ = ?slkjdf
+
+partial
+deuceIsEqualityAfter3PointsEach2 : (pointsEach: Nat ) -> (prf: LTE pointsEach 2) -> showScore (join (replicate (3 + pointsEach)  [P1, P2] )) = "deuce" 
+deuceIsEqualityAfter3PointsEach2 Z prf = Refl
+deuceIsEqualityAfter3PointsEach2 (S Z) prf = Refl
+deuceIsEqualityAfter3PointsEach2 (S (S Z)) prf = Refl
+deuceIsEqualityAfter3PointsEach2 (S (S (S _))) (LTESucc (LTESucc LTEZero)) impossible
+deuceIsEqualityAfter3PointsEach2 (S (S (S _))) (LTESucc (LTESucc (LTESucc _))) impossible
+-- deuceIsEqualityAfter3PointsEach2 k prf = Refl
+
+-- trying to proov that we go back and forth to deuce
+deuceAdvantageDeuce : (score: Score) -> {prf: score = (WrapDeuce d)} -> scoreHelper [P1, P2] score = WrapDeuce (DeuceFromAdvantage (MkAdvantage d P1))
+deuceAdvantageDeuce score = ?deuceAdvantageDeuce_rhs
 
 

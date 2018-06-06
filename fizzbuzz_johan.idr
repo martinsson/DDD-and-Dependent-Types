@@ -27,3 +27,32 @@ showFizzBuzz k = case fizzbuzz k of
                   Buzz k _ _     => "buzz"
                   FizzBuzz k _ _ => "fizzbuzz"
                   Normal k _ _   => show k
+
+
+-- Tests --
+
+threeIsFizz : showFizzBuzz 3 = "fizz"
+threeIsFizz = Refl
+
+sixIsFizz : showFizzBuzz 6 = "fizz"
+sixIsFizz = Refl
+
+multiplesOf3AreFizz : (n: Nat) -> showFizzBuzz (n*3) = "fizz"
+multiplesOf3AreFizz Z = ?multiplesOf3AreFizz_rhs_1
+multiplesOf3AreFizz (S Z) = Refl
+multiplesOf3AreFizz (S (S Z)) = Refl
+multiplesOf3AreFizz (S (S (S Z))) = Refl
+multiplesOf3AreFizz (S (S (S (S k)))) = ?multiplesOf3AreFizz_rhs_5
+
+
+multiplesOf3AreFizz2 : (n: Nat) -> (prf: modNat n 5 = 1) -> showFizzBuzz (n*3) = "fizz"
+multiplesOf3AreFizz2 Z prf = ?multiplesOf3AreFizz2_rhs_1
+multiplesOf3AreFizz2 (S k) prf = ?multiplesOf3AreFizz2_rhs_2
+
+
+multiplesOf3AreFizz3 : (n ** modNat n 5 = 1 ) -> showFizzBuzz (n*3) = "fizz"
+multiplesOf3AreFizz3 (Z ** pf) {n} = case n of
+                                      Z => ?multiplesOf3AreFizz3_rhs_1
+                                      (S k) => ?multiplesOf3AreFizz3_rhs_4
+multiplesOf3AreFizz3 ((S k) ** pf) = ?multiplesOf3AreFizz3_rhs_3
+
