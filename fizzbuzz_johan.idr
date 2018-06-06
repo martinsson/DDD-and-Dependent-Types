@@ -37,22 +37,33 @@ threeIsFizz = Refl
 sixIsFizz : showFizzBuzz 6 = "fizz"
 sixIsFizz = Refl
 
-multiplesOf3AreFizz : (n: Nat) -> showFizzBuzz (n*3) = "fizz"
-multiplesOf3AreFizz Z = ?multiplesOf3AreFizz_rhs_1
-multiplesOf3AreFizz (S Z) = Refl
-multiplesOf3AreFizz (S (S Z)) = Refl
-multiplesOf3AreFizz (S (S (S Z))) = Refl
-multiplesOf3AreFizz (S (S (S (S k)))) = ?multiplesOf3AreFizz_rhs_5
+partial
+multiplesOf3AreFizz : (n: Integer) -> showFizzBuzz (fromIntegerNat n)  = "fizz"
+multiplesOf3AreFizz 3 = Refl
+multiplesOf3AreFizz 6 = Refl
+multiplesOf3AreFizz 9 = Refl
+multiplesOf3AreFizz 12 = Refl
+multiplesOf3AreFizz 18 = Refl
 
+partial
+multiplesOf5AreFizz : (n: Integer) -> showFizzBuzz (fromIntegerNat n)  = "buzz"
+multiplesOf5AreFizz 5 = Refl
+multiplesOf5AreFizz 10 = Refl
+multiplesOf5AreFizz 20 = Refl
+multiplesOf5AreFizz 25 = Refl
+
+partial
+multiplesOf3And5AreFizzBuzz : (n: Integer) -> showFizzBuzz (fromIntegerNat n)  = "fizzbuzz"
+multiplesOf3And5AreFizzBuzz 15 = Refl
+multiplesOf3And5AreFizzBuzz 30 = Refl
+
+partial
+nonMultiples : (n: Integer) -> showFizzBuzz (fromIntegerNat n) = (show n)
+nonMultiples 1 = Refl
+nonMultiples 2 = Refl
+nonMultiples 37 = Refl
 
 multiplesOf3AreFizz2 : (n: Nat) -> (prf: modNat n 5 = 1) -> showFizzBuzz (n*3) = "fizz"
 multiplesOf3AreFizz2 Z prf = ?multiplesOf3AreFizz2_rhs_1
 multiplesOf3AreFizz2 (S k) prf = ?multiplesOf3AreFizz2_rhs_2
-
-
-multiplesOf3AreFizz3 : (n ** modNat n 5 = 1 ) -> showFizzBuzz (n*3) = "fizz"
-multiplesOf3AreFizz3 (Z ** pf) {n} = case n of
-                                      Z => ?multiplesOf3AreFizz3_rhs_1
-                                      (S k) => ?multiplesOf3AreFizz3_rhs_4
-multiplesOf3AreFizz3 ((S k) ** pf) = ?multiplesOf3AreFizz3_rhs_3
 
