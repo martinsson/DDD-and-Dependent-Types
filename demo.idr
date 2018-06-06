@@ -23,14 +23,22 @@ Pos = (Row, Column)
 parsePos : String -> Maybe Pos
 
 placeMark : (freePos: Vect (S n) Pos) -> Pos-> Vect n Pos
+parseInput : String -> Either String Pos
+
+parseAvailablePos : (freePos: Vect n Pos) -> String -> Either String (n: Pos ** Elem n freePos) 
+parseAvailablePos freePos x = ?parseAvailablePos_rhs
+
+availablePos : Vect 2 Pos
+availablePos = [(Upper, Left), (Upper, Center)] 
+
 
 main : IO() 
 main = do
   putStrLn "where do you want to put your mark?"
   x <- getLine
-  case parsePos x of
-       Nothing => ?lkjf_1
-       (Just x) => ?lkjf_2
+  case parseAvailablePos availablePos x of
+       (Left l) => ?lsjf_1
+       (Right r) => ?lsjf_2
 
 
 
