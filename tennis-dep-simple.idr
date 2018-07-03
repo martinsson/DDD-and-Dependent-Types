@@ -20,10 +20,10 @@ Show PlayerPoints where
   show Fifteen = "15"
   show Thirty = "30"
 
-nextPoint : (playerPoint: PlayerPoints) -> PlayerPoints -- -> {prf: (playerPoint = Thirty) 
-nextPoint Love    = Fifteen
-nextPoint Fifteen = Thirty
-nextPoint Thirty  = Thirty -- TODO impossible
+NotThirty : (playerPoints: PlayerPoints) -> Type
+NotThirty playerPoints = (playerPoints = Thirty -> Void)
+
+nextPoint : (playerPoints: PlayerPoints) -> {prf: NotThirty playerPoints} -> PlayerPoints -- -> {prf: (playerPoint = Thirty) 
 
 ||| I wonder why we need to use the full form of type definition and why the
 ||| simpler form doesn't work i.e.
@@ -81,7 +81,8 @@ NextScore (GameBall player playerPoints) where
   nextScore currentScore P1 {player = P1} = WrapWin (WinFromGameBall currentScore)
   nextScore currentScore P2 {player = P2} = WrapWin (WinFromGameBall currentScore)
   nextScore currentScore ballWinner {playerPoints = Thirty} = WrapDeuce (DeuceFromGameBall currentScore) 
-  nextScore currentScore ballWinner {playerPoints = _} = WrapGameBall (FromGameBall currentScore) 
+  nextScore currentScore ballWinner {playerPoints = Fifteen} = WrapGameBall (FromGameBall currentScore) 
+  nextScore currentScore ballWinner {playerPoints = Love}    = WrapGameBall (FromGameBall currentScore) 
 
 NextScore (Advantage player) where
   nextScore currentScore P1 {player = P1} = WrapWin (WinFromAdvantage currentScore)
