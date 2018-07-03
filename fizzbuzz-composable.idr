@@ -7,6 +7,10 @@ fizz n = (modNatNZ n 3 SIsNotZ) == 0
 buzz : Nat -> Bool
 buzz n = (modNatNZ n 5 SIsNotZ) == 0
 
+
+
+
+
 data FizzT : (n: Nat) ->  Type where
   Fizz : {auto fizz : So (fizz n)} -> FizzT n
   NotFizz : {auto nfizz : So (not (fizz n)) } -> FizzT n
@@ -15,6 +19,16 @@ data BuzzT : (n: Nat) -> Type where
   Buzz : {auto buzz : So (buzz n)} -> BuzzT n
   NotBuzz : {auto nbuzz : So (not (buzz n)) } -> BuzzT n
 
+fizzBuzz: (n: Nat) -> (FizzT n, BuzzT n)
+fizzBuzz n  = case (choose (fizz n),choose (buzz n)) of
+             (Left _,Right _)  => (Fizz, NotBuzz) 
+             (Right _,Left _)  => (NotFizz, Buzz)
+             (Left _,Left _)   => (Fizz, Buzz)
+             (Right _,Right _) => (NotFizz, NotBuzz)
+
+
+
+
 Show (FizzT n) where 
   show Fizz = "fizz" 
   show _ = ""
@@ -22,13 +36,6 @@ Show (FizzT n) where
 Show (BuzzT n) where 
   show Buzz = "buzz"
   show _ = ""
-
-fizzBuzz: (n: Nat) -> (FizzT n, BuzzT n)
-fizzBuzz n  = case (choose (fizz n),choose (buzz n)) of
-             (Left _,Right _) => (Fizz, NotBuzz) 
-             (Right _,Left _) => (NotFizz, Buzz)
-             (Left _,Left _) => (Fizz, Buzz)
-             (Right _,Right _) => (NotFizz, NotBuzz)
 
 showFizzBuzz : Nat -> String
 showFizzBuzz n = let (fizzy, buzzy) = (fizzBuzz n) 
