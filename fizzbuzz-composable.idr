@@ -24,19 +24,19 @@ Show (BuzzT n) where
   show Buzz = "buzz"
   show NotBuzz = ""
 
-||| the type FizzBuzz is just an alias for the tuple of FizzT and BuzzT
-FizzBuzz: Nat -> Type
-FizzBuzz n = (FizzT n, BuzzT n)
+||| the type Fizzbuzz is just an alias for the tuple of FizzT and BuzzT
+Fizzbuzz: Nat -> Type
+Fizzbuzz n = (FizzT n, BuzzT n)
 
-fizzBuzz: (n: Nat) -> FizzBuzz n
+fizzBuzz: (n: Nat) -> Fizzbuzz n
 fizzBuzz n  = case (choose (fizz n), choose (buzz n)) of
              (Left _,Right _)  => (Fizz, NotBuzz) 
              (Right _,Left _)  => (NotFizz, Buzz)
              (Left _,Left _)   => (Fizz, Buzz)
              (Right _,Right _) => (NotFizz, NotBuzz)
 
-showFizzBuzz : Nat -> String
-showFizzBuzz n = let (fizzy, buzzy) = (fizzBuzz n) 
+showFizzbuzz : Nat -> String
+showFizzbuzz n = let (fizzy, buzzy) = (fizzBuzz n) 
                      fizzbuzzy = (show fizzy) ++ (show buzzy) in
                      if fizzbuzzy == "" 
                         then show n 
@@ -45,7 +45,7 @@ showFizzBuzz n = let (fizzy, buzzy) = (fizzBuzz n)
 
 --- Tests
 partial
-multiplesOf3AreFizz : (n: Integer) -> showFizzBuzz (fromIntegerNat n)  = "fizz"
+multiplesOf3AreFizz : (n: Integer) -> showFizzbuzz (fromIntegerNat n)  = "fizz"
 multiplesOf3AreFizz 3 = Refl
 multiplesOf3AreFizz 6 = Refl
 multiplesOf3AreFizz 9 = Refl
@@ -53,19 +53,19 @@ multiplesOf3AreFizz 12 = Refl
 multiplesOf3AreFizz 18 = Refl
 
 partial
-multiplesOf5AreFizz : (n: Integer) -> showFizzBuzz (fromIntegerNat n)  = "buzz"
+multiplesOf5AreFizz : (n: Integer) -> showFizzbuzz (fromIntegerNat n)  = "buzz"
 multiplesOf5AreFizz 5 = Refl
 multiplesOf5AreFizz 10 = Refl
 multiplesOf5AreFizz 20 = Refl
 multiplesOf5AreFizz 25 = Refl
 
 partial
-multiplesOf3And5AreFizzBuzz : (n: Integer) -> showFizzBuzz (fromIntegerNat n)  = "fizzbuzz"
-multiplesOf3And5AreFizzBuzz 15 = Refl
-multiplesOf3And5AreFizzBuzz 30 = Refl
+multiplesOf3And5AreFizzbuzz : (n: Integer) -> showFizzbuzz (fromIntegerNat n)  = "fizzbuzz"
+multiplesOf3And5AreFizzbuzz 15 = Refl
+multiplesOf3And5AreFizzbuzz 30 = Refl
 
 partial
-nonMultiples : (n: Integer) -> showFizzBuzz (fromIntegerNat n) = (show n)
+nonMultiples : (n: Integer) -> showFizzbuzz (fromIntegerNat n) = (show n)
 nonMultiples 1 = Refl
 nonMultiples 2 = Refl
 nonMultiples 37 = Refl
