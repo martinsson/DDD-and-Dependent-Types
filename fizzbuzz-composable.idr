@@ -4,38 +4,36 @@ import Data.So
 fizz : Nat -> Bool
 fizz n = (modNatNZ n 3 SIsNotZ) == 0
 
-buzz : Nat -> Bool
-buzz n = (modNatNZ n 5 SIsNotZ) == 0
-
-
-
-
-
 data FizzT : (n: Nat) ->  Type where
   Fizz : {auto fizz : So (fizz n)} -> FizzT n
   NotFizz : {auto nfizz : So (not (fizz n)) } -> FizzT n
+
+Show (FizzT n) where 
+  show Fizz = "fizz" 
+  show NotFizz = ""
+
+
+buzz : Nat -> Bool
+buzz n = (modNatNZ n 5 SIsNotZ) == 0
 
 data BuzzT : (n: Nat) -> Type where
   Buzz : {auto buzz : So (buzz n)} -> BuzzT n
   NotBuzz : {auto nbuzz : So (not (buzz n)) } -> BuzzT n
 
-fizzBuzz: (n: Nat) -> (FizzT n, BuzzT n)
-fizzBuzz n  = case (choose (fizz n),choose (buzz n)) of
+Show (BuzzT n) where 
+  show Buzz = "buzz"
+  show NotBuzz = ""
+
+||| the type FizzBuzz is just an alias for the tuple of FizzT and BuzzT
+FizzBuzz: Nat -> Type
+FizzBuzz n = (FizzT n, BuzzT n)
+
+fizzBuzz: (n: Nat) -> FizzBuzz n
+fizzBuzz n  = case (choose (fizz n), choose (buzz n)) of
              (Left _,Right _)  => (Fizz, NotBuzz) 
              (Right _,Left _)  => (NotFizz, Buzz)
              (Left _,Left _)   => (Fizz, Buzz)
              (Right _,Right _) => (NotFizz, NotBuzz)
-
-
-
-
-Show (FizzT n) where 
-  show Fizz = "fizz" 
-  show _ = ""
-
-Show (BuzzT n) where 
-  show Buzz = "buzz"
-  show _ = ""
 
 showFizzBuzz : Nat -> String
 showFizzBuzz n = let (fizzy, buzzy) = (fizzBuzz n) 
@@ -45,13 +43,7 @@ showFizzBuzz n = let (fizzy, buzzy) = (fizzBuzz n)
                         else fizzbuzzy
                         
 
-
-
-
-
-
-
-
+--- Tests
 partial
 multiplesOf3AreFizz : (n: Integer) -> showFizzBuzz (fromIntegerNat n)  = "fizz"
 multiplesOf3AreFizz 3 = Refl
