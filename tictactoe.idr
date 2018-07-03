@@ -42,10 +42,23 @@ DecEq Column where
 RowAndColInput : Type
 RowAndColInput = (String, String)
 
+availablePos : Vect 2 Pos
+availablePos = [(Upper, Left), (Bottom, Left)] 
+
+
+
+
+
+
+
 placeMark : (freePos: Vect (S n) Pos) -> (p: Pos) -> (Elem p freePos) -> Vect n Pos
 placeMark freePos _ elemProof = dropElem freePos elemProof
 
 placeMarkClassic : (freePos: List Pos) -> Pos-> List Pos
+
+
+
+
 
 parseInput : RowAndColInput -> Either String Pos
 parseInput (r, c) = case (parseRow r, parseCol c) of
@@ -61,22 +74,18 @@ parseAvailablePos freePos (r, c) =
                                       (No contra) => Either.Left " ==> position is not free")
     (_, _)               => Either.Left " ==> input cannot be parsed to a row and column"
 
-availablePos : Vect 2 Pos
-availablePos = [(Upper, Left), (Bottom, Left)] 
 
-partial
-simpleMain : IO() 
-simpleMain = do
-  putStrLn "where do you want to put your mark? "
-  putStrLn "'(U)pper|(M)iddle|(B)ottom?"
-  r <- getLine
-  putStrLn "(L)eft|(C)enter|(R)ight'? "
-  c <- getLine
-  case parseInput (r, c) of
-       (Left error) => putStrLn error
-       (Right success) => putStrLn $ "OK occupying position " ++ (show (r, c) ) 
-  putStrLn ""
-  simpleMain
+
+
+
+
+
+
+
+
+
+
+
 
 partial
 strictMain : IO() 
@@ -93,6 +102,23 @@ strictMain = do
          putStrLn $ "OK occupying position " ++ (show (r, c) ) 
   putStrLn ""
   strictMain
+
+
+
+partial
+simpleMain : IO() 
+simpleMain = do
+  putStrLn "where do you want to put your mark? "
+  putStrLn "'(U)pper|(M)iddle|(B)ottom?"
+  r <- getLine
+  putStrLn "(L)eft|(C)enter|(R)ight'? "
+  c <- getLine
+  case parseInput (r, c) of
+       (Left error) => putStrLn error
+       (Right success) => putStrLn $ "OK occupying position " ++ (show (r, c) ) 
+  putStrLn ""
+  simpleMain
+
 
 partial
 main : IO()
